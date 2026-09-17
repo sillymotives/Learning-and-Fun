@@ -5,6 +5,9 @@ on:
     branches:
       - feature/bartender-50-combinations
 
+permissions:
+  contents: write
+
 jobs:
   pytest:
     runs-on: ubuntu-latest
@@ -17,5 +20,17 @@ jobs:
         with:
           python-version: '3.13'
       - run: python -m pip install -r requirements.txt
+      - run: python tools/apply_bartender_boot_pass.py
       - run: python -m py_compile adventure_game.py game/*.py
-      - run: pytest -q tests/test_cave_boot.py
+      - run: pytest -q
+      - run: git diff --check
+      - name: Commit verified source
+        run: |
+          if git diff --quiet -- game/game.py game/bartender_dialogue.py; then
+            exit 0
+          fi
+          git config user.name "sillymotives"
+          git config user.email "pacman232@gmail.com"
+          git add game/game.py game/bartender_dialogue.py
+          git commit -m "Add combinatorial bartender dialogue and flaming boot cave route"
+          git push
