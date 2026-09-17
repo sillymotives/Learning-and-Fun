@@ -294,7 +294,8 @@ class TestGame(unittest.TestCase):
         self.game.drink_from_bar()
         self.assertTrue(any(item.name.lower() == "old key" for item in self.game.player.inventory))
 
-    def test_second_drink_kills_you(self):
+    def test_second_paid_drink_kills_you(self):
+        self.game.player.coins = 2
         self.game.start("Aster")
         self.game.drink_from_bar()
         self.game.drink_from_bar()
