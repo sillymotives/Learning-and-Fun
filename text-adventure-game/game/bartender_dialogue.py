@@ -167,6 +167,10 @@ BARTENDER_DIALOGUE_RULES = (
 
 
 MODIFIER_LINES = {
+    "flaming_boot": (
+        'Bartender: "My boot is on fire. I would like that entered into the complaint exactly as stated."',
+        'Bartender: "You have weaponized my footwear. Hospitality was not designed for this."',
+    ),
     "treasure_found": (
         'Bartender: "And apparently you found the treasure. Of course you did."',
         'Bartender: "The treasure does not cancel any of the above."',
