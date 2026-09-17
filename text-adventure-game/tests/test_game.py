@@ -78,6 +78,24 @@ class TestGame(unittest.TestCase):
         self.assertTrue(self.game.lock_open)
         self.assertEqual(self.game.current_room, "cave_entrance")
 
+    def test_treasure_requires_defeating_raiders(self):
+        self.game.current_room = "forest_path"
+        self.game.take_item("hidden treasure")
+        self.assertFalse(self.game.treasure_found)
+
+    def test_sword_defeats_raiders_before_treasure(self):
+        self.game.sword_taken = True
+        self.game.move("east")
+        self.game.handle_command("fight raiders")
+        self.game.take_item("hidden treasure")
+        self.assertTrue(self.game.raiders_defeated)
+        self.assertTrue(self.game.victory)
+
+    def test_turn_back_returns_from_forest(self):
+        self.game.current_room = "forest_path"
+        self.game.handle_command("turn back")
+        self.assertEqual(self.game.current_room, "tavern")
+
 
 if __name__ == "__main__":
     unittest.main()

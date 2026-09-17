@@ -1,5 +1,6 @@
 import json
 import sys
+from textwrap import dedent
 from pathlib import Path
 
 from .items import Item
@@ -60,6 +61,38 @@ class Game:
         self.state = "in progress"
         self.current_room = "tavern"
 
+        print(dedent(r"""
+    +----------------------------------------------------------------------------+
+    |                                                                            |
+    |                         T H E   S E C R E T                              |
+    |                              T H A T   W A S N ' T                       |
+    |                                                                            |
+    |                         A COMEDIC TEXT ADVENTURE                         |
+    |                                                                            |
+    |          .----------------------------------------------------.            |
+    |         /  A forgotten treasure. A suspicious tavern.          \           |
+    |        /                A very bad secret.                      \          |
+    |        '----------------------------------------------------------'          |
+    |                                                                            |
+    |                    *                         *                             |
+    |                         .-========-.                                      |
+    |                        /  .-''''-.  \                                     |
+    |                       |  /  _  _  \  |                                    |
+    |                       | |  (o)(o)  | |                                    |
+    |                       | |     ^    | |                                    |
+    |                       |  \  '-'  /  |                                    |
+    |                       |   '-.__.-'   |                                    |
+    |                       '------||------'                                    |
+    |                           ___||___                                        |
+    |                          /   ||   \                                       |
+    |                         /____||____\                                      |
+    |                         THE END TAVERN                                   |
+    |                                                                            |
+    |              Enter bravely. Explore carefully. Read the labels.           |
+    |                                                                            |
+    +----------------------------------------------------------------------------+
+""").strip())
+
         print("\nThe rain hisses against the windows of a stone inn.")
         print("The walls are lined with cracked lanterns and old hunting trophies.")
         print("A burly barkeep wipes a mug with a weary stare.")
@@ -80,20 +113,31 @@ class Game:
         self.state = "game over"
 
     def run(self):
-        self.start_game()
-        while self.running:
-            command = input("> ").strip().lower()
-            if not command:
-                continue
-            self.handle_command(command)
+        while True:
+            self.start_game()
+            while self.running:
+                command = input("> ").strip().lower()
+                if not command:
+                    continue
+                self.handle_command(command)
+
+            replay = input("Would you like to play again? (yes/no) ").strip().lower()
+            if replay not in {"yes", "y"}:
+                return
+
+            self.__init__()
 
     def show_current_room(self):
         room = self.rooms[self.current_room]
         print(f"\n{room.name}")
         print(room.description)
 
-        if room.items:
-            print(f"You see: {', '.join(room.items)}")
+        visible_items = room.items
+        if self.current_room == "forest_path" and not self.raiders_defeated:
+            visible_items = [item for item in room.items if item.lower() != "hidden treasure"]
+
+        if visible_items:
+            print(f"You see: {', '.join(visible_items)}")
 
         if room.exits:
             exits = ", ".join(room.exits.keys())
@@ -124,15 +168,19 @@ class Game:
 
     def trigger_forest_raid(self):
         self.raiders_seen = True
+        self.current_room = "forest_path"
+        self.show_current_room()
         print("\nThe forest path beyond the tavern door is watched.")
-        print("You remember the men who followed you to the inn.")
-        print("Their eyes are in the dark, waiting for you to step out.")
-        print("You do not feel safe going back out there without a weapon.")
+        print("The raiders leap from the bushes, looking far too pleased with themselves.")
+        print('Raider captain: "Good news! We found the secret treasure."')
+        print('Second raider: "It was not very secret. It was practically labelled treasure."')
+        if not self.sword_taken:
+            print("You do not feel safe going back out there without a weapon.")
+        else:
+            print("The raiders raise their spoons, forks, and one extremely questionable sword.")
         print("")
         print("The raiders block the path.")
         print("You can: 'fight raiders' or 'turn back'")
-        self.current_room = "forest_path"
-        self.show_current_room()
 
     def handle_command(self, command):
         parts = command.split()
@@ -179,6 +227,13 @@ class Game:
             self.move(parts[1])
             return
 
+        if command in {"turn back", "go back", "retreat"}:
+            if self.current_room == "forest_path":
+                self.move("west")
+                return
+            print("There is nowhere to retreat from here.")
+            return
+
         if verb in {"take", "pickup"}:
             if len(parts) < 2:
                 print("What do you want to take?")
@@ -203,7 +258,7 @@ class Game:
             return
 
         if verb in {"fight", "attack", "strike"}:
-            if self.current_room == "forest_path" and not self.sword_taken:
+            if self.current_room == "forest_path":
                 self.fight_raiders()
                 return
             if self.current_room == "cave_chamber":
@@ -227,7 +282,16 @@ class Game:
             return
 
         if self.sword_taken:
-            print("The raiders are already behind you. You are armed now.")
+            if self.raiders_defeated:
+                print("The raiders are already behind you. Their spoons are safely confiscated.")
+                return
+
+            print("You raise your sword. The raiders raise their spoons.")
+            print("It is less of a battle and more of a very tense picnic.")
+            print("The raiders surrender and drop the treasure they definitely did not steal.")
+            print('Raider captain: "Please tell everyone we discovered it first. Secretly."')
+            self.raiders_defeated = True
+            self.show_current_room()
             return
 
         print("You step into the path and the raiders rush at once.")
@@ -296,7 +360,7 @@ class Game:
 
         if self.current_room == "tavern":
             if direction == "east":
-                if not self.sword_taken:
+                if not self.sword_taken or not self.raiders_defeated:
                     self.trigger_forest_raid()
                     return
                 self.current_room = "forest_path"
@@ -458,6 +522,9 @@ class Game:
 
         if normalized == "hidden treasure":
             if self.current_room == "forest_path":
+                if not self.raiders_defeated:
+                    print("The raiders still have the treasure. Deal with them first.")
+                    return
                 self.treasure_found = True
                 self.victory = True
                 self.player.add_item(Item(name="hidden treasure", description="A gleaming relic, old as memory itself."))
