@@ -50,6 +50,17 @@ EXTRA_INTERACTIONS = {
         "He looks down at the spreading stain.",
         'Bartender: "At least commit to the face if you are going to be strange."',
     ),
+    ("use", "crumpled map", "bartender", "tavern"): (
+        "You hold the crumpled map up to the bartender for professional review.",
+        "He squints at it upside down for several seconds.",
+        'Bartender: "Looks accurate."',
+        "This is not reassuring.",
+    ),
+    ("rub", "crumpled map", "bartender", "tavern"): (
+        "You rub the map against the bartender's apron.",
+        "The map gains an ale stain exactly where a scale bar might have gone.",
+        'Bartender: "Improved it."',
+    ),
     ("use", "coin", "bartender face", "tavern"): (
         "You hold the coin against the bartender's forehead.",
         'Bartender: "Do I look coin-operated?"',

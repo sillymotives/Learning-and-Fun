@@ -18,6 +18,8 @@ ITEM_ALIASES = {
     "coin": "coin",
     "treasure": "hidden treasure",
     "hidden treasure": "hidden treasure",
+    "map": "crumpled map",
+    "crumpled map": "crumpled map",
 }
 
 TARGET_ALIASES = {

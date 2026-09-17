@@ -11,18 +11,21 @@
     },
     "root_cellar": {
       "name": "The Lantern Cellar",
-      "description": "A cold cellar full of dust and old casks. Torch brackets line the stone wall, and a locked iron door waits deeper in the dark. The stairs climb south back to the tavern.",
+      "description": "A cold cellar full of dust and old casks. Torch brackets line the stone wall, and a locked iron door waits to the east. The stairs climb south back to the tavern.",
       "exits": {
         "south": "tavern",
-        "north": "cave_entrance"
+        "east": "cave_entrance"
       },
-      "items": ["torch", "coin"]
+      "items": [
+        "torch",
+        "coin"
+      ]
     },
     "cave_entrance": {
       "name": "The Cave Mouth",
-      "description": "The tunnel narrows into a grim cave. Everything smells of wet stone and old blood. A thin trail of pale light glows in the dark beyond, and you can feel eyes watching from deeper within.",
+      "description": "The tunnel bends east into a grim cave mouth. Everything smells of wet stone and old blood. The cellar lies west, while a thin trail of pale light leads north and deeper into the dark.",
       "exits": {
-        "south": "root_cellar",
+        "west": "root_cellar",
         "north": "cave_chamber"
       },
       "items": []
@@ -33,7 +36,9 @@
       "exits": {
         "south": "cave_entrance"
       },
-      "items": ["sword"]
+      "items": [
+        "sword"
+      ]
     },
     "forest_path": {
       "name": "Forest Path",
@@ -41,7 +46,9 @@
       "exits": {
         "west": "tavern"
       },
-      "items": ["hidden treasure"]
+      "items": [
+        "hidden treasure"
+      ]
     }
   }
 }
