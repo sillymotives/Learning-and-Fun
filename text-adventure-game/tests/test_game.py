@@ -1,4 +1,5 @@
 import unittest
+import adventure_game
 from game.game import Game
 
 
@@ -231,6 +232,42 @@ def test_burning_bartender_does_not_imagine_his_boot_was_stolen(capsys):
 
     assert "boot back" not in output
     assert "fire" in output
+
+
+def test_course_compatibility_functions_are_exposed():
+    assert callable(getattr(adventure_game, "start_game", None))
+    assert callable(getattr(adventure_game, "forest_path", None))
+    assert callable(getattr(adventure_game, "cave_path", None))
+
+
+def test_course_compatibility_start_game_returns_started_game(capsys):
+    game = adventure_game.start_game("Aster")
+    capsys.readouterr()
+
+    assert game.state == "in progress"
+    assert game.player.name == "Aster"
+
+
+def test_course_compatibility_forest_path_uses_existing_scenario(capsys):
+    game = Game()
+
+    returned = adventure_game.forest_path(game)
+    capsys.readouterr()
+
+    assert returned is game
+    assert game.current_room == "forest_path"
+    assert game.raiders_seen is True
+
+
+def test_course_compatibility_cave_path_uses_existing_scenario(capsys):
+    game = Game()
+
+    returned = adventure_game.cave_path(game)
+    output = capsys.readouterr().out.lower()
+
+    assert returned is game
+    assert game.current_room == "cave_chamber"
+    assert "choice" in output
 
 
 class TestGame(unittest.TestCase):
