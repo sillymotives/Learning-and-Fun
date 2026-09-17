@@ -810,19 +810,18 @@ class Game:
                 print('Bartender: "I appear to be on fire. One coin is still one coin."')
             elif self.bartender_boot_stolen:
                 print('Bartender: "I still want my boot back. But one coin is one coin."')
-        if self.player.coins <= 0:
+        if not self.player.spend_coin(1):
             print('Bartender: "You have no coin left, friend."')
             print('Bartender: "The second drink is always the last one."')
             self.state = "game over"; self.running = False; return
         if self.drinks_bought == 0:
-            if not self.player.spend_coin(1):
-                print('Bartender: "No coin, no drink."'); return
             self.drinks_bought += 1
             print('Bartender: "One drink, one favour. Here is the key."')
             self.player.add_item(Item("old key", "A rusted iron key. It smells of damp stone."))
             self.bartender_key_given = True
             print("The bartender slides you a key beneath the bar.")
             print("You tuck it into your pocket and leave the glass on the counter."); return
+        self.drinks_bought += 1
         print('Bartender: "Ah. A second drink."')
         print("The room sways.")
         print("The bartender smiles too slowly.")
