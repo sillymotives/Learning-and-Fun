@@ -112,3 +112,24 @@ def test_damp_boot_return_attempt_is_state_aware(capsys):
     assert "now" in output
     assert "boot" in output
     assert "wet" in output or "sock" in output or "damp" in output
+
+
+def test_flaming_boot_reignites_damp_bartender(capsys):
+    game = Game()
+    game.bartender_extinguished = True
+    game.bartender_was_extinguished = True
+    game.bartender_boot_stolen = True
+    game.bartender_hostile = True
+    game.boot_on_fire = True
+    game.player.add_item(Item("bartender's left boot", "His stolen and currently flaming boot."))
+
+    game.handle_command("use boot on bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert "not what restitution means" in output
+    assert "warm" in output
+    assert "fire" in output or "fwoom" in output
+    assert game.bartender_on_fire is True
+    assert game.bartender_extinguished is False
+    assert game.bartender_was_extinguished is True
+    assert game.boot_on_fire is True
