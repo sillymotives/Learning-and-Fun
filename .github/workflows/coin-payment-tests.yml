@@ -26,11 +26,11 @@ jobs:
       - run: pytest -q
       - name: Commit verified source
         run: |
-          if git diff --quiet -- game/game.py; then
+          if git diff --quiet -- game/game.py tests/test_game.py; then
             exit 0
           fi
           git config user.name "sillymotives"
           git config user.email "pacman232@gmail.com"
-          git add game/game.py
+          git add game/game.py tests/test_game.py
           git commit -m "Apply procedural drink behaviour"
           git push
