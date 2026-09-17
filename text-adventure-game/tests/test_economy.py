@@ -52,6 +52,7 @@ def test_wrong_place_drinking_escalates_without_ending_game(capsys):
     second = capsys.readouterr().out.lower()
 
     assert "am i an alcoholic" in first
+    assert "cellar" in first
     assert "was there something else in that first drink" in second
     assert game.failed_drink_attempts == 2
     assert game.running is True
