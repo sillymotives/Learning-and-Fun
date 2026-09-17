@@ -303,8 +303,10 @@ class TestGame(unittest.TestCase):
 
     def test_coin_in_cellar_is_pickupable(self):
         self.game.current_room = "root_cellar"
+        starting_coins = self.game.player.coins
         self.game.take_item("coin")
-        self.assertTrue(any(item.name.lower() == "coin" for item in self.game.player.inventory))
+        self.assertEqual(self.game.player.coins, starting_coins + 1)
+        self.assertFalse(any(item.name.lower() == "coin" for item in self.game.player.inventory))
 
     def test_use_key_unlocks_cave(self):
         self.game.current_room = "root_cellar"
