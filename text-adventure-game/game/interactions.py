@@ -20,6 +20,10 @@ ITEM_ALIASES = {
     "hidden treasure": "hidden treasure",
     "map": "crumpled map",
     "crumpled map": "crumpled map",
+    "beast drink": "beast drink",
+    "beast ale": "beast drink",
+    "cave drink": "beast drink",
+    "monster drink": "beast drink",
 }
 
 TARGET_ALIASES = {
@@ -31,6 +35,8 @@ TARGET_ALIASES = {
     "tavern wall": "wall", "cellar wall": "wall", "cave wall": "wall",
     "trees": "tree", "forest": "forest", "woods": "forest", "bushes": "bush",
     "raider": "raiders", "raiders": "raiders", "the raiders": "raiders",
+    "beast": "beasts", "beasts": "beasts", "the beast": "beasts", "the beasts": "beasts",
+    "creature": "beasts", "creatures": "beasts", "cave beast": "beasts", "cave beasts": "beasts",
     "casks": "cask", "barrels": "cask", "barrel": "cask",
     "iron door": "cellar door", "cellar door": "cellar door", "door": "door",
     "glowing eyes": "glowing eyes", "eyes": "glowing eyes",

@@ -19,6 +19,7 @@ from .interactions import (
 from .bartender_dialogue import (
     BARTENDER_DIALOGUE_RULES,
     bartender_interaction_overlay,
+    bartender_lick_pool,
     choose_modifier,
     match_dialogue_rule,
 )
@@ -53,6 +54,10 @@ class Game:
         self.bartender_extinguished = False
         self.bartender_was_extinguished = False
         self.boot_on_fire = False
+        self.beast_pet_count = 0
+        self.beasts_thirsty = False
+        self.beast_drink_given = False
+        self.beasts_asleep = False
         self.item_interaction_count = 0
         self.optional_interaction_count = 0
         self.flavour_counts = {}
@@ -312,11 +317,32 @@ class Game:
             flags.add("treasure_found")
         if self.boot_on_fire:
             flags.add("flaming_boot")
+        if self.beasts_thirsty:
+            flags.add("beasts_thirsty")
+        if self.beast_drink_given:
+            flags.add("beast_drink_given")
+        if self.beasts_asleep:
+            flags.add("beasts_asleep")
         return frozenset(flags)
 
     def speak_to_bartender(self):
         if self.current_room != "tavern":
             print("No one here is listening.")
+            return
+
+        if self.beasts_thirsty and not self.beast_drink_given:
+            print('Bartender: "For the cave things?"')
+            print('Bartender: "Take this drink. They are awful tippers, but better customers than you."')
+            if self.bartender_boot_stolen:
+                print('Bartender: "You stole my boot, and I am still helping the wildlife. Reflect on that."')
+            elif self.bartender_on_fire:
+                print('Bartender: "Take it before I accidentally warm it."')
+            self.player.add_item(Item(
+                "beast drink",
+                "A heavy mug of suspiciously animal-friendly tavern drink. The bartender insists it is not the second drink.",
+            ))
+            self.beast_drink_given = True
+            print("He slides a reinforced mug across the bar. It has two handles and no dignity.")
             return
 
         flags = self._bartender_flags()
@@ -654,11 +680,215 @@ class Game:
             normalize_target(target),
         )
 
+    def _beast_death(self, *lines):
+        for line in lines:
+            print(line)
+        print("You lose.")
+        self.running = False
+        self.state = "game over"
+
+    def _handle_beast_flavour(self, verb, target):
+        if self.current_room != "cave_chamber" or target != "beasts":
+            return False
+
+        if self.beasts_asleep:
+            sleepy = {
+                "inspect": (
+                    "The two enormous cave beasts are curled together in the corner, fast asleep.",
+                    "One has a paw draped over the other's nose.",
+                    "They are infuriatingly sweet and adorable.",
+                ),
+                "pet": (
+                    "You gently scratch one sleeping beast behind the ear.",
+                    "Its back foot thumps once. The other beast snuggles closer without waking.",
+                ),
+                "poke": (
+                    "You poke one sleeping beast very gently.",
+                    "It sleepily pulls the other closer with one paw. Your experiment becomes wholesome against its will.",
+                ),
+                "lick": (
+                    "You consider licking a sleeping beast.",
+                    "The narrator notices your recent personal growth and quietly closes that option.",
+                ),
+                "kick": (
+                    "You raise a foot toward the sleeping beasts.",
+                    "No. They are adorable now. Character development has limits, but it does have limits.",
+                ),
+                "sit": (
+                    "You sit beside the sleeping beasts.",
+                    "One enormous tail settles across your boots like a furry safety bar.",
+                ),
+            }
+            lines = sleepy.get(verb)
+            if lines:
+                self._print_interaction_lines(lines)
+                self._record_optional_interaction(verb, None, target)
+                return True
+            return False
+
+        if self.cave_battle_done:
+            print("The live beasts are no longer here to bother. The cave remembers them with several dents.")
+            self._record_optional_interaction(verb, None, target)
+            return True
+
+        if verb == "inspect":
+            print("You study the two cave beasts instead of immediately making a worse decision.")
+            print("Too many teeth. Too many bright eyes. Huge paws. Dry tongues.")
+            print("One of them watches your hands with suspicious concentration.")
+            self._record_optional_interaction(verb, None, target)
+            return True
+
+        if verb == "pet":
+            if self.beast_pet_count == 0:
+                self.beast_pet_count = 1
+                print("You extend a cautious hand toward the nearest beast.")
+                print("It sniffs your fingers. The chittering pauses.")
+                print("Then, impossibly, it leans its enormous head into your palm.")
+                print("The second beast looks offended that it did not think of this first.")
+            elif self.beast_pet_count == 1:
+                self.beast_pet_count = 2
+                self.beasts_thirsty = True
+                print("You pet the beast again.")
+                print("This time both of them crowd around your hands, bumping each other aside.")
+                print("One nudges your empty palm, then stares pointedly at its own dry tongue.")
+                print("The other does the same.")
+                print("Oh. They are thirsty.")
+                print("The monster problem has become a hydration problem.")
+                print("Perhaps the bartender has something suitable.")
+            else:
+                print("You pet the beasts again. They accept this as established policy.")
+                print("Both stare at your empty hands. Yes. Still thirsty.")
+            self._record_optional_interaction(verb, None, target)
+            return True
+
+        if verb == "poke":
+            self._record_optional_interaction(verb, None, target)
+            self._beast_death(
+                "You poke the nearest beast.",
+                "It looks down at your finger.",
+                "Then at you.",
+                "Experiment concluded.",
+                "Peer review is immediate and involves mauling.",
+            )
+            return True
+
+        if verb == "lick":
+            self._record_optional_interaction(verb, None, target)
+            self._beast_death(
+                "You lick the nearest cave beast.",
+                "The beast freezes.",
+                "It looks genuinely offended.",
+                "The second beast appears embarrassed on your behalf.",
+                "Then they maul you together, having found common ground.",
+            )
+            return True
+
+        if verb == "kick":
+            self._record_optional_interaction(verb, None, target)
+            self._beast_death(
+                "You kick a cave beast.",
+                "For a heartbeat, nothing happens.",
+                "Then the cave produces a practical demonstration of why kicking apex predators is poor methodology.",
+                "You are mauled with excellent footwork.",
+            )
+            return True
+
+        if verb == "sit":
+            self._record_optional_interaction(verb, None, target)
+            self._beast_death(
+                "You attempt to sit on a cave beast.",
+                "The beast objects to becoming furniture.",
+                "The objection is upheld by teeth.",
+                "Your seating experiment ends in a mauling.",
+            )
+            return True
+
+        return False
+
+    def _handle_beast_item_interaction(self, verb, item, target):
+        if self.current_room != "cave_chamber" or target != "beasts":
+            return False
+
+        if self.beasts_asleep:
+            print(f"You carefully {verb} the {item} near the sleeping beasts.")
+            print("Neither wakes. One tiny ear flicks, which is more response than this plan deserves.")
+            self._record_optional_interaction(verb, item, target)
+            return True
+
+        if self.cave_battle_done:
+            print("The beasts are gone. Your item has missed its audience.")
+            self._record_optional_interaction(verb, item, target)
+            return True
+
+        if item == "bartender's left boot":
+            self.resolve_cave_boot()
+            return True
+
+        if item == "crumpled map":
+            print("You hold the crumpled map out to the beasts.")
+            print("One sniffs it, takes the corner delicately between its teeth, and chews.")
+            print("It has eaten the least accurate piece of geography on the page.")
+            print("The map may actually have improved.")
+            self._record_optional_interaction(verb, item, target)
+            return True
+
+        if item == "beast drink":
+            if not self.beasts_thirsty:
+                print("You offer the reinforced mug to the beasts.")
+                print("They sniff it suspiciously. Apparently even monsters dislike unsolicited beverages.")
+                self._record_optional_interaction(verb, item, target)
+                return True
+            print("You set the reinforced mug down between the beasts.")
+            print("The first beast sniffs it.")
+            print("The second shoves its face in beside it.")
+            print("There is aggressive slurping.")
+            print("Then less aggressive slurping.")
+            print("Then a pair of enormous, satisfied sighs.")
+            print("Both beasts circle twice and curl up together in the corner.")
+            print("One puts a paw over the other's nose.")
+            print("They are, infuriatingly, sweet and adorable.")
+            print("The battle is over. You win through hydration.")
+            print("A heavy iron sword lies beside their nest. You take it without waking them.")
+            self.player.remove_item("beast drink")
+            self.beasts_thirsty = False
+            self.beasts_asleep = True
+            self._record_optional_interaction(verb, item, target)
+            self._finish_cave_victory("You return to the tavern carrying a sword and the knowledge that the monsters were just thirsty.")
+            return True
+
+        if item == "torch":
+            self.resolve_cave_fight(use_torch=True)
+            return True
+
+        if item == "old key":
+            print("You offer the old key to the beasts.")
+            print("One sniffs it and sneezes. Locksmithing remains unavailable as a dialogue option.")
+            self._record_optional_interaction(verb, item, target)
+            return True
+
+        if item == "coin":
+            print("You offer a coin to the beasts.")
+            print("One paws it once, decides it has terrible nutritional value, and returns to considering you instead.")
+            self._record_optional_interaction(verb, item, target)
+            return True
+
+        return False
+
     def flavour_action(self, verb, target_name):
         verb = normalize_verb(verb)
         target = normalize_target(target_name)
         if not target:
             print(f"{verb.capitalize()} what?")
+            return
+        if self._handle_beast_flavour(verb, target):
+            return
+        if verb == "lick" and target in {"bartender", "bartender face"} and self.current_room == "tavern":
+            lick_key, pool = bartender_lick_pool(self._bartender_flags())
+            counter_key = ("bartender_lick", lick_key)
+            index = self.flavour_counts.get(counter_key, 0)
+            self._print_interaction_lines(pool[index % len(pool)])
+            self.flavour_counts[counter_key] = index + 1
+            self._record_optional_interaction(verb, None, target)
             return
         if target in {"map", "crumpled map"}:
             if not self._owns_map():
@@ -722,6 +952,8 @@ class Game:
         print("He is now on fire and alarmingly enthusiastic about it.")
 
     def _handle_stateful_interaction(self, verb, item, target):
+        if self._handle_beast_item_interaction(verb, item, target):
+            return True
         if self.current_room != "tavern":
             return False
         if (
@@ -954,7 +1186,15 @@ class Game:
                     print("If only you had some light when you stepped in...")
                     print("The creatures surge from the dark and tear you apart.")
                     self.state = "game over"; self.running = False; return
-                self.current_room = "cave_chamber"; self.show_current_room(); self.cave_fight(); return
+                self.current_room = "cave_chamber"; self.show_current_room()
+                if self.beasts_asleep:
+                    print("The two cave beasts remain curled together, sleeping off their drink.")
+                    print("One paw is still draped over the other's nose. Ridiculous.")
+                    return
+                if self.cave_battle_done:
+                    print("The beast den is quiet now. Whatever happened here has stayed happened.")
+                    return
+                self.cave_fight(); return
         if self.current_room == "cave_chamber":
             if direction == "south":
                 self.current_room = "cave_entrance"; self.show_current_room(); return
@@ -972,6 +1212,12 @@ class Game:
 
     def cave_fight(self):
         if self.current_room != "cave_chamber":
+            return
+        if self.cave_battle_done:
+            if self.beasts_asleep:
+                print("The beasts are asleep in a warm, improbable heap. There is no fight left to have.")
+            else:
+                print("The beast den is quiet now. There is no fight left to have.")
             return
         print("\nThe cave is alive with eyes and chittering teeth.")
         print("A beast lurches from the dark. Another follows.")

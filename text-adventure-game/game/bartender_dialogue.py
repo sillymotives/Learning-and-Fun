@@ -289,3 +289,173 @@ def bartender_interaction_overlay(flags, verb, item, target):
         )
 
     return None
+
+
+BARTENDER_LICK_POOLS = {
+    "normal": (
+        ("You lick the bartender.", "Your tongue reports ale, smoke, and immediate professional consequences.", 'Bartender: "I am going to pretend that was a medical emergency."'),
+        ("You lick the bartender again.", "He stops polishing the mug very slowly.", 'Bartender: "Once was evidence. Twice is a policy decision."'),
+    ),
+    "bootless": (
+        ("You lick the bootless bartender.", "He looks down at his exposed sock, then back at you.", 'Bartender: "You stole my boot. Was that not enough intimacy for one evening?"'),
+        ("You lick the bartender.", "His socked foot retreats half an inch on principle.", 'Bartender: "My boot is missing and somehow my tongue-related problems are increasing."'),
+    ),
+    "hostile": (
+        ("You lick the hostile bartender.", "He becomes so still that the room develops weather.", 'Bartender: "That was your final complimentary boundary violation."'),
+        ("You lick him despite the unmistakable hostility.", "His eye twitches once.", 'Bartender: "Customer service has ended. So has licking."'),
+    ),
+    "defeated": (
+        ("You lick the defeated bartender.", "He looks toward the ruined chair as if asking it for strength.", 'Bartender: "I surrendered the fight. I did not surrender surface rights."'),
+        ("You lick him after winning the fight.", "Victory has apparently taught you nothing.", 'Bartender: "The chair died for less than this."'),
+    ),
+    "damp": (
+        ("You lick the damp bartender.", "Your tongue reports ale, rainwater, and a rapidly deteriorating social contract.", 'Bartender: "I was already wet. This is not assistance."'),
+        ("You lick the bartender while he is still damp.", "This adds no useful moisture data.", 'Bartender: "Please stop quality-testing the weather on me."'),
+    ),
+    "fire": (
+        ("You lick the burning bartender.", "This is immediately educational and extremely hot.", 'Bartender: "GOOD. Perhaps pain will teach you boundaries."'),
+        ("You attempt to lick a man who is actively on fire.", "Your tongue files an urgent thermal complaint.", 'Bartender: "I admire the commitment. Not the judgement."'),
+    ),
+    "was_extinguished": (
+        ("You lick the bartender.", "He remembers the extinguishing. Somehow this is now part of the same grievance.", 'Bartender: "You put me out once. Do not attempt temperature control with your mouth."'),
+        ("You lick him with the confidence of someone who has already managed his fire badly.", 'Bartender: "I remember summer. I also remember you ending it."'),
+    ),
+    "flaming_boot": (
+        ("You lick the bartender while holding his flaming boot.", "He watches the burning footwear instead of your tongue.", 'Bartender: "There are two emergencies here. You picked the wrong one."'),
+        ("You lick him. His stolen boot continues burning nearby.", 'Bartender: "My shoe is on fire and somehow YOU are still the least normal object in the room."'),
+    ),
+    "map_owned": (
+        ("You lick the bartender while carrying his terrible map.", 'Bartender: "Does the map show a route away from my face?"'),
+        ("You lick him.", "The crumpled map offers no guidance for this encounter.", 'Bartender: "Cartography has failed us both."'),
+    ),
+    "cave_done": (
+        ("You lick the bartender after surviving the cave.", 'Bartender: "The beasts let you live and this is what you did with the opportunity."'),
+        ("You lick him with the confidence of a cave survivor.", 'Bartender: "Whatever was underground showed remarkable restraint."'),
+    ),
+    "treasure_found": (
+        ("You lick the bartender while carrying legendary treasure.", 'Bartender: "Wealth has not improved you."'),
+        ("You lick him after finding the treasure.", "Gold glints nearby. Dignity does not.", 'Bartender: "Rich enough to retire. Still licking staff."'),
+    ),
+    "beasts_thirsty": (
+        ("You lick the bartender while thinking about the thirsty cave beasts.", 'Bartender: "Do not sample me while planning animal hydration."'),
+        ("You lick him.", 'Bartender: "If this is how you diagnosed the cave creatures, I do not want the methodology."'),
+    ),
+    "beast_drink_given": (
+        ("You lick the bartender after he gives you the beast drink.", 'Bartender: "I gave you wildlife refreshments. That was not permission."'),
+        ("You lick him while carrying the cave animals' drink.", 'Bartender: "The mug is for them. Your tongue can remain unemployed."'),
+    ),
+    "beasts_asleep": (
+        ("You lick the bartender after peacefully putting the cave beasts to sleep.", 'Bartender: "Kind to monsters. Like this to hospitality workers. Fascinating."'),
+        ("You lick him.", "Somewhere below, two enormous beasts are sleeping more politely than you behave.", 'Bartender: "They are my favourite customers now."'),
+    ),
+    "raiders_defeated": (
+        ("You lick the bartender after defeating the raiders.", 'Bartender: "The spoon people lost to this. Humiliating."'),
+        ("You lick him.", 'Bartender: "Apparently combat success creates very strange confidence."'),
+    ),
+    "sword_taken": (
+        ("You lick the bartender while armed with a sword.", 'Bartender: "Weapon on your hip. Tongue on staff. Heroism is complicated."'),
+        ("You lick him.", "He checks where the sword is before deciding how offended to be.", 'Bartender: "At least you chose the less sharp implement."'),
+    ),
+    "torch_taken": (
+        ("You lick the bartender while carrying the torch.", 'Bartender: "Given your history with fire, I am calling the tongue the safer tool."'),
+        ("You lick him.", "He watches the torch suspiciously throughout.", 'Bartender: "One hazard at a time, please."'),
+    ),
+    "key_given": (
+        ("You lick the bartender who trusted you with a cellar key.", 'Bartender: "I gave you access to the plot. This is my reward."'),
+        ("You lick him.", 'Bartender: "Return to the locked-door portion of our relationship."'),
+    ),
+    "drank": (
+        ("You lick the bartender after sampling his ale.", 'Bartender: "The drink was meant to satisfy the tasting requirement."'),
+        ("You lick him.", "He gestures toward the bar full of things designed to be consumed.", 'Bartender: "So many beverages. One bartender. An extraordinary choice."'),
+    ),
+    "map_offered": (
+        ("You lick the bartender while a map is still technically on offer.", 'Bartender: "The map costs one coin. Licking the vendor does not unlock a discount."'),
+        ("You lick him.", 'Bartender: "This has not improved your purchasing position."'),
+    ),
+    "damp_bootless_flaming": (
+        ("You lick the damp bartender.", "He glances at the flaming boot you stole from him.", 'Bartender: "You are holding my burning shoe. Why am I the thing being tasted?"'),
+        ("You lick a cold, wet, one-boot-short bartender while his stolen boot burns nearby.", "His face passes through several kinds of disbelief.", 'Bartender: "This complaint no longer fits on one form."'),
+    ),
+    "fire_bootless_flaming": (
+        ("You lick the burning, bootless bartender while his stolen boot is also on fire.", 'Bartender: "At last. A complete inventory of bad decisions."'),
+        ("You lick him. Both bartender and boot continue burning.", 'Bartender: "There are TWO fires and you chose mouth contact."'),
+    ),
+    "damp_bootless": (
+        ("You lick the damp, bootless bartender.", "Your tongue reports ale, rainwater, and sock-adjacent despair.", 'Bartender: "You stole my boot, soaked me, and now you are checking the seasoning?"'),
+        ("You lick him while he stands wet and asymmetrically shod.", 'Bartender: "This evening has acquired a distressingly specific texture."'),
+    ),
+    "fire_bootless": (
+        ("You lick the burning, bootless bartender.", "He looks offended that the flames did not deter you.", 'Bartender: "GOOD. Perhaps pain will teach you where my boot belongs."'),
+        ("You lick him despite the fire and the missing footwear.", 'Bartender: "Hot, furious, one boot short, and somehow still serving you."'),
+    ),
+    "bootless_flaming": (
+        ("You lick the bartender while holding his flaming stolen boot.", 'Bartender: "My footwear is burning in your possession and this is your follow-up?"'),
+        ("You lick him. The burning boot crackles nearby.", 'Bartender: "Return shoe. Extinguish shoe. Stop tasting staff. Pick any order."'),
+    ),
+    "fire_was_extinguished": (
+        ("You lick the bartender after setting him on fire again.", 'Bartender: "Last time you put me out. I see we are varying the technique."'),
+        ("You lick the reignited bartender.", 'Bartender: "I remembered summer. I did not miss this part."'),
+    ),
+    "defeated_bootless": (
+        ("You lick the defeated, bootless bartender.", 'Bartender: "You won the fight and stole the boot. There was no bonus objective here."'),
+        ("You lick him.", "He looks at the ruined chair, then his exposed sock.", 'Bartender: "Victory has made you unbearable."'),
+    ),
+    "cave_bootless": (
+        ("You lick the bartender after surviving the cave with his boot still missing.", 'Bartender: "The beasts showed better boundaries, and they have chittering teeth."'),
+        ("You lick him.", 'Bartender: "You navigated a monster cave but cannot navigate my boot home."'),
+    ),
+    "treasure_bootless": (
+        ("You lick the bartender while rich and still in possession of stolen-footwear history.", 'Bartender: "Legendary treasure. Missing boot. Licked employee. A heroic record."'),
+        ("You lick him.", 'Bartender: "Gold does not reimburse socks."'),
+    ),
+    "beast_drink_bootless": (
+        ("You lick the bartender after he gives you a drink for the beasts whose cave you entered with his boot.", 'Bartender: "I am helping the wildlife. You stole my shoe. Reflect on the moral hierarchy."'),
+        ("You lick him while carrying the beast drink.", 'Bartender: "They tip badly. You behave worse. Somehow they are ahead."'),
+    ),
+}
+
+BARTENDER_LICK_COMBINATIONS = (
+    ("damp_bootless_flaming", frozenset({"damp", "bootless", "flaming_boot"})),
+    ("fire_bootless_flaming", frozenset({"fire", "bootless", "flaming_boot"})),
+    ("damp_bootless", frozenset({"damp", "bootless"})),
+    ("fire_bootless", frozenset({"fire", "bootless"})),
+    ("bootless_flaming", frozenset({"bootless", "flaming_boot"})),
+    ("fire_was_extinguished", frozenset({"fire", "was_extinguished"})),
+    ("defeated_bootless", frozenset({"defeated", "bootless"})),
+    ("cave_bootless", frozenset({"cave_done", "bootless"})),
+    ("treasure_bootless", frozenset({"treasure_found", "bootless"})),
+    ("beast_drink_bootless", frozenset({"beast_drink_given", "bootless"})),
+)
+
+BARTENDER_LICK_PRIORITY = (
+    "beasts_asleep",
+    "fire",
+    "damp",
+    "flaming_boot",
+    "bootless",
+    "defeated",
+    "hostile",
+    "was_extinguished",
+    "treasure_found",
+    "cave_done",
+    "beast_drink_given",
+    "beasts_thirsty",
+    "map_owned",
+    "raiders_defeated",
+    "sword_taken",
+    "torch_taken",
+    "key_given",
+    "map_offered",
+    "drank",
+)
+
+
+def bartender_lick_pool(flags):
+    flags = frozenset(flags)
+    for key, required in BARTENDER_LICK_COMBINATIONS:
+        if required <= flags:
+            return key, BARTENDER_LICK_POOLS[key]
+    for key in BARTENDER_LICK_PRIORITY:
+        if key in flags:
+            return key, BARTENDER_LICK_POOLS[key]
+    return "normal", BARTENDER_LICK_POOLS["normal"]
