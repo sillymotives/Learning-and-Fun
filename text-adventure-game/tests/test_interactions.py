@@ -16,7 +16,7 @@ def test_interaction_alias_normalization():
 
 
 def test_static_interaction_pack_is_large_enough():
-    assert 80 <= len(STATIC_INTERACTIONS) <= 120
+    assert 160 <= len(STATIC_INTERACTIONS) <= 190
 
 from game.game import Game
 
