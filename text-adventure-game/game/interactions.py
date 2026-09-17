@@ -224,3 +224,9 @@ def get_static_interaction(verb, item, target, room_id):
         room_id,
     )
     return STATIC_INTERACTIONS.get(key) or STATIC_INTERACTIONS.get((key[0], key[1], key[2], None))
+
+
+# The core registry stays readable; larger content waves live in focused packs.
+from .flavour_expansion import EXTRA_INTERACTIONS
+
+STATIC_INTERACTIONS.update(EXTRA_INTERACTIONS)
