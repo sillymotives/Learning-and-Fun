@@ -204,3 +204,69 @@ def test_help_lists_flavour_commands(capsys):
     assert "poke/kick/lick <target>" in output
     assert "pet <target>" in output
     assert "sit [on <target>]" in output
+
+
+def test_bartender_standard_flavour_verbs_are_bespoke(capsys):
+    expectations = {
+        "inspect bartender": "apron",
+        "poke bartender": "finger",
+        "kick bartender": "kick",
+        "lick bartender": "tongue",
+        "pet bartender": "hand",
+        "sit on bartender": "lap",
+    }
+    for command, phrase in expectations.items():
+        game = Game()
+        game.handle_command(command)
+        output = capsys.readouterr().out.lower()
+        assert phrase in output, command
+        assert "the bartender notices" not in output, command
+
+
+def test_bartender_item_interactions_cover_common_inventory(capsys):
+    game = Game()
+    game.player.coins = 5
+    game.drink_from_bar()
+    capsys.readouterr()
+    game.torch_taken = True
+    game.sword_taken = True
+    game.player.add_item(type("Item", (), {"name": "sword", "description": ""})())
+    game.handle_command("steal from bartender")
+    capsys.readouterr()
+
+    for command in [
+        "rub coin on bartender",
+        "use key on bartender",
+        "rub mug on bartender",
+        "use drink on bartender",
+        "rub boot on bartender",
+        "use treasure on bartender",
+    ]:
+        if command == "use treasure on bartender":
+            game.player.add_item(type("Item", (), {"name": "hidden treasure", "description": ""})())
+        game.handle_command(command)
+        output = capsys.readouterr().out.lower()
+        assert "the bartender notices" not in output, command
+        assert "nothing improves" not in output, command
+
+
+def test_expanded_interaction_pack_has_real_density():
+    assert 160 <= len(STATIC_INTERACTIONS) <= 190
+
+
+def test_common_room_targets_have_multiple_bespoke_verbs():
+    required = {
+        "tavern": ["bartender", "bar", "chair", "wall", "sign"],
+        "root_cellar": ["cask", "wall", "cellar door", "stairs"],
+        "cave_entrance": ["wall", "darkness", "glowing eyes"],
+        "cave_chamber": ["bones", "beast den", "stone", "wall"],
+        "forest_path": ["tree", "bush", "mud", "raiders", "grass"],
+    }
+    for room, targets in required.items():
+        for target in targets:
+            count = sum(
+                1
+                for verb in ("inspect", "poke", "kick", "lick", "pet", "sit")
+                if (verb, None, target, room) in STATIC_INTERACTIONS
+            )
+            assert count >= 3, (room, target, count)
