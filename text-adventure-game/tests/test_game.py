@@ -144,6 +144,95 @@ def test_bartender_is_very_upset_about_his_boot(capsys):
     assert "boot" in output or "sock" in output
 
 
+def test_use_torch_on_bartender_sets_him_on_fire(capsys):
+    game = Game()
+    game.torch_taken = True
+
+    game.handle_command("use torch on bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert game.bartender_on_fire is True
+    assert game.bartender_hostile is True
+    assert game.running is True
+    assert "freezing for twenty years" in output
+
+
+def test_rub_alias_can_polish_wall_with_stolen_boot(capsys):
+    game = Game()
+
+    game.handle_command("steal from bartender")
+    capsys.readouterr()
+
+    game.handle_command("rub boot on wall")
+    output = capsys.readouterr().out.lower()
+
+    assert "boot" in output
+    assert "wall" in output
+    assert "polish" in output
+
+
+def test_generic_item_on_target_interaction_is_funny(capsys):
+    game = Game()
+    game.torch_taken = True
+
+    game.handle_command("use torch on ceiling")
+    output = capsys.readouterr().out.lower()
+
+    assert "torch" in output
+    assert "ceiling" in output
+
+
+def test_item_interaction_requires_possession(capsys):
+    game = Game()
+
+    game.handle_command("use sword on chandelier")
+    output = capsys.readouterr().out.lower()
+
+    assert "not carrying" in output
+    assert game.running is True
+
+
+def test_flaming_bartender_fights_with_flaming_chair(capsys):
+    game = Game()
+    game.torch_taken = True
+    game.sword_taken = True
+
+    game.handle_command("use torch on bartender")
+    capsys.readouterr()
+
+    game.handle_command("fight bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert game.bartender_defeated is True
+    assert game.bartender_on_fire is True
+    assert "chair catches fire" in output
+    assert "hospitality" in output
+
+
+def test_help_advertises_item_on_target_and_rubbing(capsys):
+    game = Game()
+
+    game.print_help()
+    output = capsys.readouterr().out.lower()
+
+    assert "use <item> on <target>" in output
+    assert "rub <item> on <target>" in output
+
+
+def test_burning_bartender_does_not_imagine_his_boot_was_stolen(capsys):
+    game = Game()
+    game.torch_taken = True
+
+    game.handle_command("use torch on bartender")
+    capsys.readouterr()
+
+    game.drink_from_bar()
+    output = capsys.readouterr().out.lower()
+
+    assert "boot back" not in output
+    assert "fire" in output
+
+
 class TestGame(unittest.TestCase):
     def setUp(self):
         self.game = Game()

@@ -29,6 +29,8 @@ class Game:
         self.bartender_hostile = False
         self.bartender_defeated = False
         self.bartender_talk_counts = {}
+        self.bartender_on_fire = False
+        self.item_interaction_count = 0
 
     def _load_rooms(self):
         story_path = Path(__file__).resolve().parents[1] / "data" / "story.json"
@@ -190,7 +192,15 @@ class Game:
             print("No one here is listening.")
             return
 
-        if self.bartender_defeated:
+        if self.bartender_on_fire:
+            state = "fire"
+            lines = [
+                'Bartender: "FINALLY. This place has been freezing for twenty years."',
+                'Bartender: "Do not put me out. I have never felt better."',
+                'Bartender: "I am beginning to understand candles."',
+            ]
+
+        elif self.bartender_defeated:
             state = "defeated"
             lines = [
                 'Bartender: "You won. The chair did not."',
@@ -289,26 +299,48 @@ class Game:
 
         if self.bartender_defeated:
             print("The bartender has already surrendered.")
-            print("He points meaningfully at the remains of the chair.")
+            if self.bartender_on_fire:
+                print("He is also still on fire, apparently by choice.")
+            else:
+                print("He points meaningfully at the remains of the chair.")
             return
 
         if not self.sword_taken:
-            print("You square up to the bartender.")
-            print("He slowly puts down the mug.")
-            print("He snaps the bar towel once.")
-            print("This somehow becomes a complete martial art.")
-            print("Three seconds later, he folds you like tavern laundry.")
+            if self.bartender_on_fire:
+                print("You square up to the burning bartender.")
+                print("He snaps the bar towel once.")
+                print("The towel immediately catches fire.")
+                print('Bartender: "EVEN BETTER."')
+                print("This somehow improves his technique.")
+                print("Three seconds later, he folds you like flaming tavern laundry.")
+            else:
+                print("You square up to the bartender.")
+                print("He slowly puts down the mug.")
+                print("He snaps the bar towel once.")
+                print("This somehow becomes a complete martial art.")
+                print("Three seconds later, he folds you like tavern laundry.")
+
             print("You lose.")
             self.bartender_hostile = True
             self.running = False
             self.state = "game over"
             return
 
-        print("You draw your sword.")
-        print("The bartender looks at the blade, then at you.")
-        print("He sighs and reaches beneath the bar.")
-        print("He produces an entire wooden chair.")
-        print("You have several questions. None survive first contact.")
+        if self.bartender_on_fire:
+            print("You draw your sword.")
+            print("The bartender is still enthusiastically on fire.")
+            print("He looks at the blade and grins.")
+            print("He reaches beneath the bar.")
+            print("He produces an entire wooden chair.")
+            print("The chair catches fire immediately.")
+            print('Bartender: "NOW THIS IS HOSPITALITY."')
+        else:
+            print("You draw your sword.")
+            print("The bartender looks at the blade, then at you.")
+            print("He sighs and reaches beneath the bar.")
+            print("He produces an entire wooden chair.")
+            print("You have several questions. None survive first contact.")
+
         print("")
         print("Sword meets chair.")
         print("Chair meets ceiling.")
@@ -328,9 +360,7 @@ class Game:
             self.player.add_item(
                 Item(
                     name="old key",
-                    description=(
-                        "A rusted iron key. It smells of damp stone."
-                    ),
+                    description="A rusted iron key. It smells of damp stone.",
                 )
             )
             self.bartender_key_given = True
@@ -440,9 +470,36 @@ class Game:
             self.take_item(item_name)
             return
 
-        if verb in {"use", "unlock"}:
+        if verb in {"use", "rub"}:
             if len(parts) < 2:
-                print("Use what?")
+                if verb == "rub":
+                    print("Rub what on what?")
+                else:
+                    print("Use what?")
+                return
+
+            request = " ".join(parts[1:]).strip()
+
+            if " on " in request:
+                item_name, target_name = request.split(" on ", 1)
+
+                self.use_item_on(
+                    item_name,
+                    target_name,
+                    action=verb,
+                )
+                return
+
+            if verb == "rub":
+                print("Rub what on what? Try 'rub <item> on <target>'.")
+                return
+
+            self.use_item(request)
+            return
+
+        if verb == "unlock":
+            if len(parts) < 2:
+                print("Unlock with what?")
                 return
             self.use_item(" ".join(parts[1:]))
             return
@@ -529,6 +586,182 @@ class Game:
         self.running = False
         self.state = "game over"
 
+    def _carried_interaction_item(self, item_name):
+        normalized = item_name.lower().strip()
+
+        aliases = {
+            "boot": "bartender's left boot",
+            "left boot": "bartender's left boot",
+            "bartender's boot": "bartender's left boot",
+            "bartender's left boot": "bartender's left boot",
+            "key": "old key",
+            "old key": "old key",
+            "light": "torch",
+            "torch": "torch",
+            "blade": "sword",
+            "sword": "sword",
+            "coin": "coin",
+        }
+
+        canonical = aliases.get(normalized, normalized)
+
+        if canonical == "coin" and self.player.coins > 0:
+            return "coin"
+
+        if canonical == "torch" and self.torch_taken:
+            return "torch"
+
+        if canonical == "sword" and self.sword_taken:
+            return "sword"
+
+        for carried in self.player.inventory:
+            if carried.name.lower() == canonical:
+                return carried.name.lower()
+
+        return None
+
+
+    def ignite_bartender(self):
+        if self.current_room != "tavern":
+            print("There is no bartender here to set on fire.")
+            return
+
+        if self.bartender_on_fire:
+            print("The bartender is already on fire.")
+            print('Bartender: "Do not be greedy."')
+            return
+
+        self.bartender_on_fire = True
+        self.bartender_hostile = True
+
+        print("You carefully introduce the torch to the bartender.")
+        print("His apron catches.")
+        print("Then his sleeve.")
+        print("Then, somehow, the rest of him.")
+        print("")
+        print("The bartender looks down at the flames.")
+        print("He considers the situation.")
+        print('Bartender: "FINALLY. This place has been freezing for twenty years."')
+        print("He straightens his burning apron and looks noticeably happier.")
+        print("He is now on fire and alarmingly enthusiastic about it.")
+
+
+    def use_item_on(self, item_name, target_name, action="use"):
+        item = self._carried_interaction_item(item_name)
+        target = target_name.lower().strip()
+
+        if target.startswith("the "):
+            target = target[4:].strip()
+
+        if not target:
+            print("Use it on what?")
+            return
+
+        if item is None:
+            print(f"You are not carrying {item_name.strip()}.")
+            return
+
+        bartender_targets = {
+            "bartender",
+            "barkeep",
+            "innkeeper",
+        }
+
+        boot_targets = {
+            "boot",
+            "left boot",
+            "bartender's boot",
+            "bartender's left boot",
+        }
+
+        wall_targets = {
+            "wall",
+            "walls",
+            "stone wall",
+            "tavern wall",
+        }
+
+        if target in bartender_targets:
+            if self.current_room != "tavern":
+                print("There is no bartender here.")
+                return
+
+            if item == "torch":
+                self.ignite_bartender()
+                return
+
+            if item == "sword":
+                print("You apply the sword to the bartender.")
+                print("This is generally known as starting a fight.")
+                self.fight_bartender()
+                return
+
+            if item == "bartender's left boot":
+                print("You rub the bartender's stolen left boot against his apron.")
+                print('Bartender: "That is NOT the same as giving it back."')
+                self.bartender_hostile = True
+                return
+
+            if item == "old key":
+                print("You press the old key against the bartender.")
+                print("He looks at it for slightly too long.")
+                print('Bartender: "I recognise nothing."')
+                print("He very obviously recognises it.")
+                return
+
+            if item == "coin":
+                print("You press a coin against the bartender.")
+                print("His hand opens automatically.")
+                print("You pull the coin back.")
+                print('Bartender: "Cruel."')
+                return
+
+        if item == "torch" and target in boot_targets:
+            print("You apply the torch to the boot.")
+            print("The smell of hot leather immediately fills the room.")
+            print("Every decision that led here becomes questionable at once.")
+            return
+
+        if item == "bartender's left boot" and target in wall_targets:
+            print("You polish the wall with the bartender's stolen left boot.")
+            print("The wall becomes marginally shinier.")
+            print("The boot becomes spiritually worse.")
+            return
+
+        action_word = "rub" if action == "rub" else "use"
+
+        responses = [
+            (
+                f"You {action_word} the {item} on the {target}. "
+                "Nothing improves."
+            ),
+            (
+                f"You {action_word} the {item} on the {target}. "
+                "The universe quietly records the incident."
+            ),
+            (
+                f"You {action_word} the {item} on the {target}. "
+                "Against all expectations, this reveals absolutely nothing."
+            ),
+            (
+                f"You {action_word} the {item} on the {target}. "
+                "Somewhere, an adventure-game designer develops a headache."
+            ),
+            (
+                f"You {action_word} the {item} on the {target}. "
+                "The target endures this with remarkable professionalism."
+            ),
+        ]
+
+        print(
+            responses[
+                self.item_interaction_count % len(responses)
+            ]
+        )
+
+        self.item_interaction_count += 1
+
+
     def use_item(self, item_name):
         item = item_name.lower().strip()
 
@@ -569,19 +802,22 @@ class Game:
 
     def print_help(self):
         print("Commands:")
-        print("  look                 inspect the current room")
-        print("  go <direction>       move north, south, east, or west")
-        print("  take <item>          pick up something you can see")
-        print("  use <item>           use an item you are carrying")
-        print("  inventory            show what you are carrying")
-        print("  speak                talk to the bartender")
-        print("  drink                buy a drink at the tavern")
-        print("  steal                steal from the bartender")
-        print("  fight <target>       fight someone or something")
-        print("  turn back            retreat from the forest")
-        print("  map                  show the world map")
-        print("  help                 show this command list")
-        print("  quit                 leave the game")
+        print("  look                    inspect the current room")
+        print("  go <direction>          move north, south, east, or west")
+        print("  take <item>             pick up something you can see")
+        print("  use <item>              use an item normally")
+        print("  use <item> on <target>  use one thing on another")
+        print("  rub <item> on <target>  same idea, less dignity")
+        print("  inventory               show what you are carrying")
+        print("  speak                   talk to someone nearby")
+        print("  drink                   buy a drink at the tavern")
+        print("  steal                   attempt an ill-advised theft")
+        print("  fight <target>          fight someone or something")
+        print("  turn back               retreat from the forest")
+        print("  map                     show the world map")
+        print("  help                    show this command list")
+        print("  quit                    leave the game")
+
 
     def move(self, direction):
         room = self.rooms[self.current_room]
@@ -777,10 +1013,21 @@ class Game:
             return
 
         if self.bartender_hostile and not self.bartender_defeated:
-            print(
-                'Bartender: "I still want my boot back. '
-                'But one coin is one coin."'
-            )
+            if self.bartender_on_fire and self.bartender_boot_stolen:
+                print(
+                    'Bartender: "You stole my boot AND set me on fire. '
+                    'One coin is still one coin."'
+                )
+            elif self.bartender_on_fire:
+                print(
+                    'Bartender: "I appear to be on fire. '
+                    'One coin is still one coin."'
+                )
+            elif self.bartender_boot_stolen:
+                print(
+                    'Bartender: "I still want my boot back. '
+                    'But one coin is one coin."'
+                )
 
         if self.player.coins <= 0:
             print('Bartender: "You have no coin left, friend."')
