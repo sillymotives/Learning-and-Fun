@@ -1,0 +1,85 @@
+{
+  "rooms": {
+    "start": {
+      "name": "The Forest Entrance",
+      "description": "You stand at the edge of a dark forest. A cold wind moves through the trees and a small path leads north.",
+      "exits": {
+        "north": "glade"
+      },
+      "items": ["torch"]
+    },
+    "glade": {
+      "name": "Moonlit Glade",
+      "description": "You enter a quiet clearing with glowing flowers and a tiny stone shrine.",
+      "exits": {
+        "south": "start"
+      },
+      "items": ["key"]
+    },
+    "tavern": {
+      "name": "The End Tavern",
+      "description": "You stand inside a crooked inn with a low ceiling, low beams, and a brass bar glimmering beneath a single lamp. The room smells of smoke, damp stone, and faded memories. A heavy wooden door leads east into a forest path, and a locked stone stair drops north into the cellar below.",
+      "exits": {
+        "east": "forest_path",
+        "north": "root_cellar"
+      },
+      "items": []
+    },
+    "root_cellar": {
+      "name": "The Lantern Cellar",
+      "description": "A cold cellar full of dust and old casks. Torch brackets line the stone wall, and a locked iron door waits deeper in the dark. The stairs climb south back to the tavern.",
+      "exits": {
+        "south": "tavern",
+        "north": "cave_entrance"
+      },
+      "items": ["torch", "coin"]
+    },
+    "cave_entrance": {
+      "name": "The Cave Mouth",
+      "description": "The tunnel narrows into a grim cave. Everything smells of wet stone and old blood. A thin trail of pale light glows in the dark beyond, and you can feel eyes watching from deeper within.",
+      "exits": {
+        "south": "root_cellar",
+        "north": "cave_chamber"
+      },
+      "items": []
+    },
+    "cave_chamber": {
+      "name": "The Beast Den",
+      "description": "The cave is full of jagged stone, shattered bones, and glowing eyes in the dark. The floor is slick with old gore, and something in the shadows is breathing.",
+      "exits": {
+        "south": "cave_entrance"
+      },
+      "items": ["sword"]
+    },
+    "forest_path": {
+      "name": "Forest Path",
+      "description": "A narrow path winds through pine and dead grass. The air smells of rain and distant thunder. Beyond the trees, the path ends in a small glade with something glinting in the dirt.",
+      "exits": {
+        "west": "tavern"
+      },
+      "items": ["hidden treasure"]
+    }
+  },
+  "characters": {
+    "old_man": {
+      "description": "An old man with a long beard. He seems to know a lot about the forest.",
+      "location": "tavern",
+      "dialogue": "Beware of the cave, young traveller. It holds many secrets."
+    },
+    "mysterious_figure": {
+      "description": "A shadowy figure lurking in the cave. You cannot see their face.",
+      "location": "cave_chamber",
+      "dialogue": "Leave this place, or face the consequences."
+    }
+  },
+  "items": {
+    "magic_stone": {
+      "description": "A glowing stone that radiates warmth. It is said to have magical properties.",
+      "location": "forest_path"
+    },
+    "village_key": {
+      "description": "A rusty key that opens the village gate.",
+      "location": "tavern"
+    }
+  }
+}
