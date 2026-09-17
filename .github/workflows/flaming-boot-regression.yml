@@ -1,0 +1,20 @@
+name: Flaming Boot Regression
+
+on:
+  push:
+    branches:
+      - fix/flaming-boot-restitution
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: text-adventure-game
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r requirements.txt
+      - run: pytest -q tests/test_bartender_dialogue.py::test_flaming_boot_reignites_damp_bartender
