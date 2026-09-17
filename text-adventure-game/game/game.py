@@ -138,6 +138,13 @@ class Game:
         parts = command.split()
         verb = parts[0]
 
+        if command == "turn back":
+            if self.current_room == "forest_path":
+                self.move("west")
+            else:
+                print("There is nothing to turn back from.")
+            return
+
         if verb in {"quit", "exit"}:
             self.running = False
             self.state = "game over"
@@ -280,6 +287,7 @@ class Game:
         print("  use key    - unlock the cellar door")
         print("  use torch  - use the torch in the cave")
         print("  fight      - fight raiders or cave beasts")
+        print("  turn back  - retreat from the raiders")
         print("  help       - show this menu")
         print("  quit       - exit the game")
 
