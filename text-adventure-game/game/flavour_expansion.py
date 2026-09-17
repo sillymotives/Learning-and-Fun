@@ -122,6 +122,9 @@ EXTRA_INTERACTIONS = {
     ("pet", None, "beast den", "cave_chamber"): ("You pet the beast den. This is technically pet-adjacent, which is the closest you should get.",),
     ("inspect", None, "stone", "cave_chamber"): ("The stone is jagged, black, and completely innocent of whatever story you are projecting onto it.",),
     ("poke", None, "stone", "cave_chamber"): ("You poke the stone. It remains the strongest conversationalist in the chamber.",),
+    ("inspect", None, "wall", "cave_chamber"): ("The chamber wall is claw-scarred stone with the ambience of an extremely hostile guestbook.",),
+    ("poke", None, "wall", "cave_chamber"): ("You poke the chamber wall. A grain of grit falls off in protest.",),
+    ("pet", None, "wall", "cave_chamber"): ("You pet the cave wall. It is cold, rough, and notably less bitey than the former residents.",),
 
     # Forest path.
     ("inspect", None, "raiders", "forest_path"): ("The raiders are armed with picnic cutlery and the confidence of men who have never met consequences.",),
