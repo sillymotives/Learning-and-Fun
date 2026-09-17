@@ -724,6 +724,28 @@ class Game:
     def _handle_stateful_interaction(self, verb, item, target):
         if self.current_room != "tavern":
             return False
+        if (
+            item == "bartender's left boot"
+            and target == "bartender"
+            and self.boot_on_fire
+            and self.bartender_extinguished
+        ):
+            print("You offer the bartender his left boot.")
+            print("It is on fire.")
+            print("He looks at the boot.")
+            print("He looks at you.")
+            print("He looks back at the boot.")
+            print('Bartender: "That is not what restitution means."')
+            print("The cuff brushes his apron.")
+            print("FWOOMPH.")
+            self.bartender_on_fire = True
+            self.bartender_extinguished = False
+            self.bartender_hostile = True
+            print("He closes his eyes.")
+            print('Bartender: "...warm."')
+            print('Bartender: "I hate that this helped."')
+            self._record_optional_interaction(verb, item, target)
+            return True
         if item == "torch" and target == "bartender":
             self.ignite_bartender()
             return True
