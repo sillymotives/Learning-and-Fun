@@ -1,6 +1,7 @@
 from pathlib import Path
 
-path = Path(__file__).resolve().parents[1] / "game" / "game.py"
+root = Path(__file__).resolve().parents[1]
+path = root / "game" / "game.py"
 text = path.read_text(encoding="utf-8")
 
 old = '        self.drinks_bought = 0\n'
@@ -82,3 +83,25 @@ if new not in text:
     text = text.replace(old, new, 1)
 
 path.write_text(text, encoding="utf-8")
+
+test_path = root / "tests" / "test_game.py"
+test_text = test_path.read_text(encoding="utf-8")
+old_test = '''    def test_second_drink_kills_you(self):
+        self.game.start("Aster")
+        self.game.drink_from_bar()
+        self.game.drink_from_bar()
+        self.assertEqual(self.game.state, "game over")
+'''
+new_test = '''    def test_second_paid_drink_kills_you(self):
+        self.game.player.coins = 2
+        self.game.start("Aster")
+        self.game.drink_from_bar()
+        self.game.drink_from_bar()
+        self.assertEqual(self.game.state, "game over")
+'''
+if new_test not in test_text:
+    if old_test not in test_text:
+        raise SystemExit("second-drink regression anchor not found")
+    test_text = test_text.replace(old_test, new_test, 1)
+
+test_path.write_text(test_text, encoding="utf-8")
