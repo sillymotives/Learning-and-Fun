@@ -33,9 +33,8 @@ class Player:
     def show_inventory(self):
         if not self.inventory:
             print("You are carrying nothing.")
-            return
-
-        print("Inventory:")
-        for item in self.inventory:
-            print(f" - {item.name}: {item.description or 'No description.'}")
+        else:
+            print("Inventory:")
+            for item in self.inventory:
+                print(f" - {item.name}: {item.description or 'No description.'}")
         print(f"Coins: {self.coins}")
