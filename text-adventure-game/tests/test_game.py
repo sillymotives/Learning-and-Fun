@@ -36,6 +36,17 @@ def test_old_prototype_rooms_are_not_loaded():
     assert "glade" not in game.rooms
 
 
+def test_start_screen_has_elaborate_tavern(capsys):
+    game = Game()
+    game.start("Aster")
+    output = capsys.readouterr().out
+
+    assert "T H E   S E C R E T   T H A T   W A S N ' T" in output
+    assert "NO REFUNDS" in output
+    assert "SECOND DRINK" in output
+    assert "THE END" in output
+
+
 class TestGame(unittest.TestCase):
     def setUp(self):
         self.game = Game()
