@@ -47,6 +47,103 @@ def test_start_screen_has_elaborate_tavern(capsys):
     assert "THE END" in output
 
 
+def test_stealing_bartenders_left_boot(capsys):
+    game = Game()
+
+    game.handle_command("steal from bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert game.bartender_boot_stolen is True
+    assert game.bartender_hostile is True
+    assert any(
+        item.name.lower() == "bartender's left boot"
+        for item in game.player.inventory
+    )
+    assert "boot" in output
+
+    # Apparently business outranks footwear.
+    game.drink_from_bar()
+    assert any(
+        item.name.lower() == "old key"
+        for item in game.player.inventory
+    )
+
+
+def test_fighting_bartender_without_sword_is_a_terrible_idea(capsys):
+    game = Game()
+
+    game.handle_command("fight bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert game.state == "game over"
+    assert game.running is False
+    assert "towel" in output
+
+
+def test_fighting_bartender_with_sword_defeats_him(capsys):
+    game = Game()
+    game.sword_taken = True
+
+    game.handle_command("fight bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert game.bartender_defeated is True
+    assert game.running is True
+    assert "chair" in output
+    assert any(
+        item.name.lower() == "old key"
+        for item in game.player.inventory
+    )
+
+
+def test_help_uses_generic_item_and_target_commands(capsys):
+    game = Game()
+
+    game.print_help()
+    output = capsys.readouterr().out.lower()
+
+    assert "use <item>" in output
+    assert "fight <target>" in output
+    assert "steal" in output
+    assert "use key" not in output
+    assert "use torch" not in output
+
+
+def test_bartender_does_not_dump_the_walkthrough(capsys):
+    game = Game()
+
+    game.speak_to_bartender()
+    output = capsys.readouterr().out.lower()
+
+    assert "torch" not in output
+    assert "unlock" not in output
+    assert "cave" not in output
+
+
+def test_bartender_dialogue_rotates(capsys):
+    game = Game()
+
+    game.speak_to_bartender()
+    first = capsys.readouterr().out
+
+    game.speak_to_bartender()
+    second = capsys.readouterr().out
+
+    assert first != second
+
+
+def test_bartender_is_very_upset_about_his_boot(capsys):
+    game = Game()
+
+    game.handle_command("steal from bartender")
+    capsys.readouterr()
+
+    game.speak_to_bartender()
+    output = capsys.readouterr().out.lower()
+
+    assert "boot" in output or "sock" in output
+
+
 class TestGame(unittest.TestCase):
     def setUp(self):
         self.game = Game()

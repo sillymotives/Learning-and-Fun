@@ -25,6 +25,10 @@ class Game:
         self.raiders_seen = False
         self.raiders_defeated = False
         self.cave_battle_done = False
+        self.bartender_boot_stolen = False
+        self.bartender_hostile = False
+        self.bartender_defeated = False
+        self.bartender_talk_counts = {}
 
     def _load_rooms(self):
         story_path = Path(__file__).resolve().parents[1] / "data" / "story.json"
@@ -186,12 +190,160 @@ class Game:
             print("No one here is listening.")
             return
 
-        print('Bartender: "If you want the cellar key, buy a drink. One coin."')
-        print('Bartender: "The first drink is honest. The second is a mistake."')
-        print('Bartender: "The cellar is below. The cave is deeper."')
-        print('Bartender: "The key unlocks the old iron door beneath the tavern."')
-        print('Bartender: "If you go into the cave without a light, it will eat you alive."')
-        print('Bartender: "And if you think a torch is a weapon, the dark will claim you."')
+        if self.bartender_defeated:
+            state = "defeated"
+            lines = [
+                'Bartender: "You won. The chair did not."',
+                'Bartender: "Take your victory and stop looking at my furniture."',
+                'Bartender: "I am exercising my right to be unhelpful."',
+            ]
+
+        elif self.bartender_boot_stolen:
+            state = "boot"
+            lines = [
+                'Bartender: "My boot."',
+                'Bartender: "You stole footwear from a man serving suspicious liquor."',
+                'Bartender: "I can see my sock. This conversation is over."',
+            ]
+
+        elif self.sword_taken:
+            state = "sword"
+            lines = [
+                'Bartender: "The forest has been noisy lately. Very noisy."',
+                'Bartender: "East has had a lot of shouting and suspicious cutlery."',
+                'Bartender: "Anyone claiming they found something secret is probably lying."',
+            ]
+
+        elif self.torch_taken:
+            state = "torch"
+            lines = [
+                'Bartender: "Light lets you see a bad idea. It does not make it a good weapon."',
+                'Bartender: "Some things in the dark are less impressed by fire than you would hope."',
+                'Bartender: "Protect whatever keeps you from being eaten in the dark."',
+            ]
+
+        elif self.bartender_key_given:
+            state = "key"
+            lines = [
+                'Bartender: "The cellar is colder than the ale. That is all I am saying."',
+                'Bartender: "Old locks rarely guard empty rooms."',
+                'Bartender: "If you hear breathing below, try not to assume it is yours."',
+            ]
+
+        else:
+            state = "early"
+            lines = [
+                'Bartender: "Secrets around here tend to go down before they go out."',
+                'Bartender: "One coin buys one drink. Sometimes one drink buys something else."',
+                'Bartender: "The End has doors that reward nosy people."',
+            ]
+
+        index = self.bartender_talk_counts.get(state, 0)
+        print(lines[index % len(lines)])
+        self.bartender_talk_counts[state] = index + 1
+
+
+    def steal_from_bartender(self):
+        if self.current_room != "tavern":
+            print("There is no bartender here to steal from.")
+            return
+
+        if self.bartender_defeated:
+            print("The bartender watches you carefully.")
+            print("You have already won. Leave his remaining footwear alone.")
+            return
+
+        if self.bartender_boot_stolen:
+            print("You already stole his left boot.")
+            print("He has moved the right one somewhere secure.")
+            return
+
+        print("You lean casually across the bar.")
+        print("Your hand disappears below the counter.")
+        print("You steal the bartender's left boot.")
+        print("He is still wearing it.")
+        print("The fact that this works seems to upset reality itself.")
+
+        self.player.add_item(
+            Item(
+                name="bartender's left boot",
+                description=(
+                    "A large, battered tavern boot acquired through "
+                    "methods best described as geometrically suspicious."
+                ),
+            )
+        )
+        self.bartender_boot_stolen = True
+        self.bartender_hostile = True
+
+        print('Bartender: "..."')
+        print('Bartender: "Did you just steal my boot?"')
+        print('Bartender: "I was WEARING that."')
+        print("The bartender is now extremely hostile.")
+
+
+    def fight_bartender(self):
+        if self.current_room != "tavern":
+            print("There is no bartender here to fight.")
+            return
+
+        if self.bartender_defeated:
+            print("The bartender has already surrendered.")
+            print("He points meaningfully at the remains of the chair.")
+            return
+
+        if not self.sword_taken:
+            print("You square up to the bartender.")
+            print("He slowly puts down the mug.")
+            print("He snaps the bar towel once.")
+            print("This somehow becomes a complete martial art.")
+            print("Three seconds later, he folds you like tavern laundry.")
+            print("You lose.")
+            self.bartender_hostile = True
+            self.running = False
+            self.state = "game over"
+            return
+
+        print("You draw your sword.")
+        print("The bartender looks at the blade, then at you.")
+        print("He sighs and reaches beneath the bar.")
+        print("He produces an entire wooden chair.")
+        print("You have several questions. None survive first contact.")
+        print("")
+        print("Sword meets chair.")
+        print("Chair meets ceiling.")
+        print("A mug achieves low orbit.")
+        print("The bartender finally raises both hands.")
+        print('Bartender: "Fine. FINE. You win."')
+
+        self.bartender_defeated = True
+        self.bartender_hostile = False
+
+        has_key = any(
+            item.name.lower() == "old key"
+            for item in self.player.inventory
+        )
+
+        if not has_key:
+            self.player.add_item(
+                Item(
+                    name="old key",
+                    description=(
+                        "A rusted iron key. It smells of damp stone."
+                    ),
+                )
+            )
+            self.bartender_key_given = True
+            print("He slides the old cellar key across the bar.")
+            print('Bartender: "Take it. And leave my furniture alone."')
+        else:
+            print(
+                "You already have the cellar key, so he surrenders "
+                "the only thing he has left: dignity."
+            )
+
+        self.running = True
+
 
     def trigger_forest_raid(self):
         self.raiders_seen = True
@@ -237,6 +389,25 @@ class Game:
 
         if verb in {"speak", "talk", "chat"}:
             self.speak_to_bartender()
+            return
+
+        if verb in {"steal", "rob", "nick"}:
+            target = " ".join(parts[1:]).strip()
+            valid_targets = {
+                "",
+                "bartender",
+                "the bartender",
+                "from bartender",
+                "from the bartender",
+                "barkeep",
+                "from barkeep",
+            }
+
+            if target not in valid_targets:
+                print(f"You cannot steal {target}.")
+                return
+
+            self.steal_from_bartender()
             return
 
         if verb in {"look", "l"}:
@@ -285,13 +456,43 @@ class Game:
             return
 
         if verb in {"fight", "attack", "strike"}:
-            if self.current_room == "forest_path":
+            target = " ".join(parts[1:]).strip()
+
+            if target in {
+                "bartender",
+                "the bartender",
+                "barkeep",
+                "innkeeper",
+            }:
+                self.fight_bartender()
+                return
+
+            if (
+                self.current_room == "forest_path"
+                and target in {"", "raider", "raiders", "the raiders"}
+            ):
                 self.fight_raiders()
                 return
-            if self.current_room == "cave_chamber":
+
+            if (
+                self.current_room == "cave_chamber"
+                and target in {
+                    "",
+                    "beast",
+                    "beasts",
+                    "creature",
+                    "creatures",
+                    "cave beast",
+                    "cave beasts",
+                }
+            ):
                 self.resolve_cave_fight(use_torch=False)
                 return
-            print("There is nothing here to fight.")
+
+            if target:
+                print(f"There is no {target} here to fight.")
+            else:
+                print("Fight whom? Try 'fight <target>'.")
             return
 
         if verb in {"pound", "gorilla", "chest"}:
@@ -368,19 +569,19 @@ class Game:
 
     def print_help(self):
         print("Commands:")
-        print("  look       - inspect the room")
-        print("  go <dir>   - move north, south, east, west")
-        print("  take <item>- pick up an item")
-        print("  inventory  - show your items")
-        print("  speak      - talk to the bartender")
-        print("  map        - show the world map")
-        print("  drink      - buy a drink from the bartender")
-        print("  use key    - unlock the cellar door")
-        print("  use torch  - use the torch in the cave")
-        print("  fight      - fight raiders or cave beasts")
-        print("  turn back  - retreat from the raiders")
-        print("  help       - show this menu")
-        print("  quit       - exit the game")
+        print("  look                 inspect the current room")
+        print("  go <direction>       move north, south, east, or west")
+        print("  take <item>          pick up something you can see")
+        print("  use <item>           use an item you are carrying")
+        print("  inventory            show what you are carrying")
+        print("  speak                talk to the bartender")
+        print("  drink                buy a drink at the tavern")
+        print("  steal                steal from the bartender")
+        print("  fight <target>       fight someone or something")
+        print("  turn back            retreat from the forest")
+        print("  map                  show the world map")
+        print("  help                 show this command list")
+        print("  quit                 leave the game")
 
     def move(self, direction):
         room = self.rooms[self.current_room]
@@ -574,6 +775,12 @@ class Game:
         if self.current_room != "tavern":
             print("There is no bar here.")
             return
+
+        if self.bartender_hostile and not self.bartender_defeated:
+            print(
+                'Bartender: "I still want my boot back. '
+                'But one coin is one coin."'
+            )
 
         if self.player.coins <= 0:
             print('Bartender: "You have no coin left, friend."')
