@@ -71,6 +71,7 @@ def normalize_verb(name):
 
 
 STATIC_INTERACTIONS = {
+    # Tavern item-on-target
     ("rub", "drink", "bartender face", "tavern"): (
         "You scoop up a heroic quantity of ale and rub it directly into the bartender's face.",
         "He stands perfectly still.",
@@ -96,6 +97,8 @@ STATIC_INTERACTIONS = {
     ("rub", "torch", "bartender's left boot", "tavern"): ("You rub a burning torch against the stolen boot.", "Hot leather answers a question nobody asked."),
     ("use", "hidden treasure", "bartender", "tavern"): ("You present the legendary treasure to the bartender.", 'Bartender: "Lovely. Put it somewhere that is not my bar."'),
     ("rub", "hidden treasure", "bartender", "tavern"): ("You rub priceless treasure against the bartender's apron.", 'Bartender: "You make wealth look exhausting."'),
+
+    # Tavern standalone
     ("inspect", None, "chair", "tavern"): ("It is a sturdy wooden chair with combat experience it refuses to discuss.",),
     ("inspect", None, "bar", "tavern"): ("The bar is scarred by mugs, coins, and several decisions that became case law.",),
     ("inspect", None, "sign", "tavern"): ("The sign says NO REFUNDS AFTER THE SECOND DRINK. It has the confidence of precedent.",),
@@ -112,6 +115,8 @@ STATIC_INTERACTIONS = {
     ("sit", None, "chair", "tavern"): ("You sit in the chair. For once, the chair is used according to manufacturer intent.",),
     ("sit", None, "floor", "tavern"): ("You sit on the tavern floor. The bartender quietly upgrades you from customer to local feature.",),
     ("sit", None, "bar", "tavern"): ("You sit on the bar. The bartender moves every glass two inches farther away.",),
+
+    # Cellar item-on-target
     ("use", "old key", "torch", "root_cellar"): ("You touch the key to the torch. Neither object reveals a secret secondary profession.",),
     ("rub", "old key", "torch", "root_cellar"): ("You rub iron against burning timber. The smell is mostly confidence.",),
     ("use", "bartender's left boot", "cellar door", "root_cellar"): ("You present the stolen boot to the iron door. The door remains class-conscious.",),
@@ -121,6 +126,8 @@ STATIC_INTERACTIONS = {
     ("use", "torch", "cask", "root_cellar"): ("You consider introducing fire to an unidentified cask. Survival instinct finally clocks in.",),
     ("rub", "bartender's left boot", "cask", "root_cellar"): ("You rub the stolen boot over the cask. The cellar acquires another smell it did not request.",),
     ("use", "coin", "wall", "root_cellar"): ("You attempt commerce with the cellar wall. The wall offers zero percent interest and no liquidity.",),
+
+    # Cellar standalone
     ("inspect", None, "damp stone", "root_cellar"): ("The damp stone has spent centuries perfecting the colour 'basement'.",),
     ("inspect", None, "torch bracket", "root_cellar"): ("The bracket is empty once the torch is taken and somehow looks accusatory about it.",),
     ("inspect", None, "cask", "root_cellar"): ("The casks are old, sealed, and labelled in handwriting that became illegal several alphabets ago.",),
@@ -133,6 +140,8 @@ STATIC_INTERACTIONS = {
     ("pet", None, "cask", "root_cellar"): ("You pat the cask affectionately. It gives nothing away.",),
     ("sit", None, "cask", "root_cellar"): ("You sit on a cask. Somewhere inside it, a liquid judges your weight distribution.",),
     ("sit", None, "stairs", "root_cellar"): ("You sit on the stairs and briefly become the obstacle the dungeon was missing.",),
+
+    # Cave item-on-target
     ("use", "coin", "wall", "cave_entrance"): ("You offer the cave wall a coin. Geology remains defiantly pre-capitalist.",),
     ("rub", "coin", "wall", "cave_entrance"): ("You rub money on the cave wall. The wall's net worth is unaffected.",),
     ("use", "sword", "stone", "cave_chamber"): ("You strike stone with the sword. The stone wins by being a stone.",),
@@ -140,6 +149,8 @@ STATIC_INTERACTIONS = {
     ("rub", "bartender's left boot", "sword", "cave_chamber"): ("You polish the sword with the stolen boot. The blade is now technically shined and spiritually compromised.",),
     ("use", "bartender's left boot", "bones", "cave_chamber"): ("You place the boot among the bones. For one terrible second it looks archaeologically plausible.",),
     ("use", "torch", "darkness", "cave_entrance"): ("You use the torch on the darkness. For once, object-oriented programming accurately describes the situation.",),
+
+    # Cave standalone
     ("inspect", None, "bones", "cave_chamber"): ("The bones belong to creatures that either fought bravely or failed a very similar tutorial.",),
     ("inspect", None, "glowing eyes", "cave_entrance"): ("The glowing eyes inspect you back. The review is not favourable.",),
     ("inspect", None, "beast den", "cave_chamber"): ("The beast den contains scratches, bones, and a conspicuously sword-shaped absence.",),
@@ -151,6 +162,8 @@ STATIC_INTERACTIONS = {
     ("pet", None, "darkness", "cave_entrance"): ("You pet the darkness. Something in it appears to appreciate the gesture. This is worse.",),
     ("sit", None, "beast den", "cave_chamber"): ("You sit in the beast den. It is surprisingly ergonomic and deeply concerning.",),
     ("sit", None, "floor", "cave_chamber"): ("You sit on the cave floor. Adventure waits with visible impatience.",),
+
+    # Forest item-on-target
     ("use", "torch", "forest", "forest_path"): ("You raise the torch toward the forest.", "Narrator: No.", "You lower the torch."),
     ("rub", "torch", "tree", "forest_path"): ("You move the burning torch toward a tree. The narrator clears their throat with legal force.",),
     ("use", "coin", "tree", "forest_path"): ("You offer a coin to the tree. It is already heavily invested in timber.",),
@@ -160,6 +173,8 @@ STATIC_INTERACTIONS = {
     ("rub", "hidden treasure", "raiders", "forest_path"): ("You rub the treasure on the defeated raiders. Nobody learns anything from this victory.",),
     ("use", "sword", "spoon", "forest_path"): ("You cross sword and spoon. The spoon retires undefeated in spirit.",),
     ("use", "sword", "fork", "forest_path"): ("You duel a fork with a sword. It is technically four points to one.",),
+
+    # Forest standalone
     ("inspect", None, "spoon", "forest_path"): ("The raider spoon is polished, threatening, and absolutely unsuitable for war.",),
     ("inspect", None, "fork", "forest_path"): ("The fork has four points and the tactical doctrine of a picnic.",),
     ("inspect", None, "mud", "forest_path"): ("The mud contains footprints, rainwater, and the shattered remains of several dignities.",),
