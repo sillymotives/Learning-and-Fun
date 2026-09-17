@@ -20,6 +20,22 @@ def test_take_torch_adds_to_inventory():
     assert any(item.name == "torch" for item in game.player.inventory)
 
 
+def test_turn_back_retreats_from_raiders_to_tavern():
+    game = Game()
+    game.trigger_forest_raid()
+
+    game.handle_command("turn back")
+
+    assert game.current_room == "tavern"
+    assert game.running is True
+
+
+def test_old_prototype_rooms_are_not_loaded():
+    game = Game()
+    assert "start" not in game.rooms
+    assert "glade" not in game.rooms
+
+
 class TestGame(unittest.TestCase):
     def setUp(self):
         self.game = Game()
