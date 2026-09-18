@@ -385,3 +385,65 @@ def test_second_wave_static_packs_do_not_duplicate_each_other():
         + len(interaction_module.FOREST_STATIC_INTERACTIONS)
     )
     assert len(interaction_module.SECOND_WAVE_STATIC_INTERACTIONS) == expected
+
+
+def test_impossible_drink_survives_non_drinking_flavour_spam(capsys):
+    game = Game()
+    game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+
+    for room, command in [
+        ("tavern", "use impossible drink on bartender"),
+        ("root_cellar", "use impossible drink on cask"),
+        ("cave_chamber", "use impossible drink on beast"),
+        ("forest_path", "use impossible drink on raiders"),
+    ]:
+        game.current_room = room
+        if room == "cave_chamber":
+            game.beasts_thirsty = True
+            game.beast_pet_count = 2
+        game.handle_command(command)
+        capsys.readouterr()
+        assert game._has_inventory_item("impossible drink")
+
+    game.handle_command("drink impossible drink")
+    capsys.readouterr()
+
+    assert game.victory is True
+    assert game.running is False
+
+
+def test_normal_treasure_route_survives_second_wave_interactions(capsys):
+    game = Game()
+    game.player.coins = 5
+
+    for command in [
+        "inspect sign",
+        "pet bartender",
+        "use coin on wall",
+    ]:
+        game.handle_command(command)
+        capsys.readouterr()
+
+    game.drink_from_bar()
+    capsys.readouterr()
+
+    game.move("north")
+    capsys.readouterr()
+    game.take_item("torch")
+    capsys.readouterr()
+    game.use_item("key")
+    capsys.readouterr()
+    game.move("north")
+    capsys.readouterr()
+
+    game.resolve_cave_fight(use_torch=False)
+    capsys.readouterr()
+    game.move("east")
+    capsys.readouterr()
+    game.handle_command("fight raiders")
+    capsys.readouterr()
+    game.take_item("hidden treasure")
+    capsys.readouterr()
+
+    assert game.victory is True
+    assert game.state == "victory"
