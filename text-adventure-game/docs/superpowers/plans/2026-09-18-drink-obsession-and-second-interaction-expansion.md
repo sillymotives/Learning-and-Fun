@@ -210,6 +210,17 @@ def test_drink_impossible_drink_requires_inventory(capsys):
     assert game.victory is False
 
 
+def test_impossible_alias_routes_to_same_inventory_drink(capsys):
+    game = Game()
+    game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+
+    game.handle_command("drink impossible")
+    capsys.readouterr()
+
+    assert game.victory is True
+    assert not game._has_inventory_item("impossible drink")
+
+
 def test_drinking_impossible_drink_is_real_alternate_victory(capsys):
     game = Game()
     game.state = "in progress"
@@ -696,15 +707,16 @@ In `Game`:
         return frozenset(flags)
 ```
 
-In `_handle_beast_flavour()`:
+Refactor `_handle_beast_flavour()` to use this exact precedence:
 
-- preserve the existing pet progression because it mutates `beast_pet_count` and `beasts_thirsty`
-- preserve existing hostile lethal actions
-- before hostile lethal `poke/lick/kick/sit`, query `BEAST_STATE_INTERACTIONS`
-- when thirsty or asleep, a matching state rule returns safely
-- when no thirsty/asleep rule matches, existing behavior remains
+1. If `beasts_asleep`, query `BEAST_STATE_INTERACTIONS` first and return on a match. Sleeping actions must never fall into live-beast pet progression or hostile deaths.
+2. If `cave_battle_done` and the beasts are not asleep, keep the existing “beasts are gone” response.
+3. If `verb == "pet"` and the beasts are live, preserve the existing pet progression because it mutates `beast_pet_count` and `beasts_thirsty`.
+4. For live beasts, query `BEAST_STATE_INTERACTIONS`. This gives thirsty variants precedence over hostile behavior.
+5. Preserve the existing hostile `inspect` response and lethal `poke/lick/kick/sit` branches as the fallback for live, non-thirsty beasts.
+6. If none match, return `False` and allow the normal interaction system to continue.
 
-Use:
+Use this lookup in steps 1 and 4:
 
 ```python
         lines = get_state_interaction(
@@ -719,8 +731,6 @@ Use:
             self._record_optional_interaction(verb, None, target)
             return True
 ```
-
-Place this after the pet progression and before the hostile lethal branches.
 
 - [ ] **Step 5: Route beast item state content after explicit consequence items**
 
