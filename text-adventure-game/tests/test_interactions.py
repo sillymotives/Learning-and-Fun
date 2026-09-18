@@ -361,3 +361,27 @@ def test_impossible_drink_on_raiders_is_bespoke_and_preserved(capsys):
     assert "impossible" in output or "reality" in output
     assert game._has_inventory_item("impossible drink")
     assert game.running is True
+
+
+def test_second_wave_contains_at_least_100_new_rule_keys():
+    assert hasattr(interaction_module, "SECOND_WAVE_RULE_COUNT")
+    assert interaction_module.SECOND_WAVE_RULE_COUNT >= 100
+
+
+def test_second_wave_static_keys_do_not_replace_legacy_jokes():
+    assert hasattr(interaction_module, "LEGACY_INTERACTION_KEYS")
+    assert hasattr(interaction_module, "SECOND_WAVE_STATIC_INTERACTIONS")
+    assert interaction_module.LEGACY_INTERACTION_KEYS.isdisjoint(
+        interaction_module.SECOND_WAVE_STATIC_INTERACTIONS
+    )
+
+
+def test_second_wave_static_packs_do_not_duplicate_each_other():
+    assert hasattr(interaction_module, "SECOND_WAVE_STATIC_INTERACTIONS")
+    expected = (
+        len(interaction_module.TAVERN_STATIC_INTERACTIONS)
+        + len(interaction_module.BEAST_STATIC_INTERACTIONS)
+        + len(interaction_module.CELLAR_STATIC_INTERACTIONS)
+        + len(interaction_module.FOREST_STATIC_INTERACTIONS)
+    )
+    assert len(interaction_module.SECOND_WAVE_STATIC_INTERACTIONS) == expected
