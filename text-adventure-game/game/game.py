@@ -187,6 +187,10 @@ class Game:
     def _owns_map(self):
         return any(item.name.lower() == "crumpled map" for item in self.player.inventory)
 
+    def _has_inventory_item(self, name):
+        wanted = name.lower()
+        return any(item.name.lower() == wanted for item in self.player.inventory)
+
     def _maybe_offer_map(self):
         if (
             self.current_room != "tavern"
@@ -587,6 +591,11 @@ class Game:
             self.use_item(" ".join(parts[1:])); return
         if verb in {"torch", "key"}:
             self.use_item(verb); return
+        if verb == "drink" and len(parts) > 1:
+            requested = normalize_item(" ".join(parts[1:]))
+            if requested == "impossible drink":
+                self.drink_impossible_drink()
+                return
         if verb == "drink":
             self.drink_from_bar(); return
         if verb in {"fight", "attack", "strike"}:
@@ -1322,6 +1331,41 @@ class Game:
         self.player.add_item(Item(item_name, item_name))
         print(f"You picked up {item_name}.")
 
+    def _handle_drink_obsession_milestone(self, attempt):
+        if attempt == 5:
+            print("[Drink obsession milestone] Five attempts. This is becoming a pattern.")
+            return
+        if attempt == 10:
+            print("[Drink obsession milestone] Ten attempts. This has officially become a habit.")
+            return
+        if attempt == 20:
+            print("[Drink obsession milestone] Twenty attempts. Reality has filed a complaint.")
+            print("There is a small pop.")
+            if not self._has_inventory_item("impossible drink"):
+                self.player.add_item(Item(
+                    "Impossible Drink",
+                    "A sealed drink summoned by repeated refusal to accept local beverage availability.",
+                ))
+            print("A sealed drink appears in your hand.")
+            print("It is cold. It is real.")
+            print("The universe has capitulated.")
+            return
+        if attempt == 50:
+            print("[Drink obsession milestone] Fifty attempts.")
+            if self._has_inventory_item("impossible drink"):
+                print("You are carrying a perfectly valid ending.")
+                print("You have chosen instead to keep trying to drink the atmosphere.")
+            else:
+                print("Somewhere, the bartender feels a disturbance in the ale.")
+            return
+        if attempt == 100:
+            print("[Drink obsession milestone] Attempt 100.")
+            if self._has_inventory_item("impossible drink"):
+                print("You still have a perfectly valid ending in your pocket.")
+            print("This is no longer thirst.")
+            print("This is a completed research programme.")
+            self._unlock_achievement("longitudinal_study")
+
     def _drink_in_wrong_place(self):
         self.failed_drink_attempts += 1
         attempt = self.failed_drink_attempts
@@ -1349,18 +1393,28 @@ class Game:
             "cave_chamber": "The cave contains monsters, bones, and no functioning bar staff.",
             "forest_path": "The forest remains stubbornly unlicensed.",
         }
-        milestones = {
-            10: "Ten attempts. This has officially become a habit.",
-            25: "Twenty-five attempts. You are now conducting beverage research.",
-            50: "Fifty attempts. Somewhere, the bartender feels a disturbance in the ale.",
-            100: "Attempt 100. This is no longer thirst. This is a longitudinal study.",
-        }
-
         print(f"Attempt {attempt}: {openings[(attempt - 1) % len(openings)]}")
         print(thoughts[(attempt - 1) % len(thoughts)])
         print(room_lines.get(self.current_room, "The universe declines to provide a drink here."))
-        if attempt in milestones:
-            print(f"[Drink obsession milestone] {milestones[attempt]}")
+        self._handle_drink_obsession_milestone(attempt)
+
+    def drink_impossible_drink(self):
+        if not self._has_inventory_item("impossible drink"):
+            print("You do not have an Impossible Drink.")
+            return
+
+        print("You break the seal.")
+        print("It tastes like every drink you tried to summon and none of them.")
+        print("Rain. Smoke. Ale. Cold stone. Something faintly impossible.")
+        print("The tavern, the cave, the forest, the treasure... all of it seems suddenly very far away.")
+        print("You were never looking for the secret.")
+        print("You were thirsty.")
+        print("And now you are not.")
+        print("You win.")
+        self.player.remove_item("Impossible Drink")
+        self.victory = True
+        self.state = "victory"
+        self.running = False
 
     def drink_from_bar(self):
         if self.current_room != "tavern":
