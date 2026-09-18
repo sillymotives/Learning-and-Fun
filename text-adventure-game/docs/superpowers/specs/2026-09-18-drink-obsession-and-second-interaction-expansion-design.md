@@ -73,6 +73,22 @@ New content will be divided by domain:
 - `game/flavour_cellar.py`
 - `game/flavour_forest.py`
 
+Static rules in these packs use the existing key shape:
+
+```python
+(verb, item_or_none, target, room_id)
+```
+
+Where state matters, a pack may also export a small state-keyed response table, for example a key conceptually shaped like:
+
+```python
+(state_name, verb, item_or_none, target)
+```
+
+A named stateful handler chooses from that table. The table owns content; the handler owns state inspection and any gameplay consequence.
+
+This allows hostile / thirsty / sleeping beast variants and bartender combinations without forcing state into the global static-interaction key or adding dozens of branches to `handle_command()`.
+
 The existing `game/flavour_expansion.py` stays unchanged unless a tiny compatibility edit is required.
 
 This is a content organization boundary, not a new runtime subsystem.
@@ -256,9 +272,11 @@ Representative tone:
 
 ### Quantity
 
-The implementation adds **at least 100 new bespoke interactions** beyond the current interaction registries.
+The implementation adds **at least 100 new bespoke interaction rules** beyond the current interaction registries.
 
-This minimum is tested structurally at the content-pack level rather than by asserting every joke's exact wording.
+A rule counts when it has a distinct static command key or a distinct state-aware key. Multiple alternate lines for the same key do not inflate the count.
+
+This minimum is tested structurally across the new content packs rather than by asserting every joke's exact wording.
 
 ### Distribution
 
@@ -449,7 +467,7 @@ The minimum red-green coverage includes:
 - `drink impossible drink` consumes the item and sets a real victory state
 - 50 and 100 text notices the still-carried Impossible Drink
 - Longitudinal Study unlocks at 100
-- at least 100 new bespoke content entries exist
+- at least 100 new bespoke rule keys exist across static and state-aware content packs
 - representative interactions from every content pack
 - bartender specific-state rules beat generic rules
 - hostile / thirsty / sleeping beast behavior remains distinct
