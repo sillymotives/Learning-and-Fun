@@ -263,6 +263,14 @@ This avoids growing another large block of prose inside `game.py`.
 
 Use Flask as a thin Python web layer.
 
+Use an application factory with the public interface:
+
+```python
+create_app(config: dict | None = None) -> Flask
+```
+
+Tests inject configuration directly through the factory. Normal local/hosted startup reads required secrets from environment variables and validates them during app creation.
+
 Use server-rendered HTML plus small vanilla JavaScript for command submission and transcript updates.
 
 Do not add React, Vue, a Node build pipeline, or another front-end framework.
@@ -320,7 +328,15 @@ The existing game prints extensively.
 
 For this playtest phase, avoid a project-wide print-to-emitter rewrite unless tests prove it necessary.
 
-The web bridge may capture the engine's existing stdout with `contextlib.redirect_stdout()`, protected by a process-wide lock so concurrent requests cannot mix output.
+The web bridge may capture the engine's existing stdout with `contextlib.redirect_stdout()`, protected by a process-wide re-entrant lock so concurrent requests cannot mix output.
+
+Every bridge operation that can invoke print-producing game code runs inside that same lock, including:
+
+- initial opening-room rendering
+- command execution
+- reset/opening rendering
+
+No Flask route may call print-producing `Game` methods directly outside the bridge.
 
 This deliberately trades command-level parallelism for a small, low-risk adapter. Text-adventure commands are extremely short, so serializing command execution is acceptable for the intended private playtest audience.
 
@@ -330,7 +346,7 @@ A future output-emitter refactor may replace this bridge if the game later needs
 
 Each authenticated browser receives a random session identifier stored in Flask's signed session cookie.
 
-Server memory maps that identifier to its own game session.
+Server memory maps that identifier to its own game session through a small session-store object owned by the Flask application, for example via `app.extensions`. Tests must be able to create a fresh store per app instance rather than sharing process-global game state.
 
 One playtester cannot alter another playtester's:
 
