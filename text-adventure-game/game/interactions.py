@@ -236,7 +236,22 @@ def get_static_interaction(verb, item, target, room_id):
     return STATIC_INTERACTIONS.get(key) or STATIC_INTERACTIONS.get((key[0], key[1], key[2], None))
 
 
+def get_state_interaction(rules, flags, verb, item, target):
+    matches = []
+    for (required, rule_verb, rule_item, rule_target), lines in rules.items():
+        if rule_verb != verb or rule_item != item or rule_target != target:
+            continue
+        if required <= flags:
+            matches.append((len(required), lines))
+    if not matches:
+        return None
+    matches.sort(key=lambda pair: pair[0], reverse=True)
+    return matches[0][1]
+
+
 # The core registry stays readable; larger content waves live in focused packs.
 from .flavour_expansion import EXTRA_INTERACTIONS
+from .flavour_tavern import TAVERN_STATIC_INTERACTIONS, TAVERN_STATE_INTERACTIONS
 
 STATIC_INTERACTIONS.update(EXTRA_INTERACTIONS)
+STATIC_INTERACTIONS.update(TAVERN_STATIC_INTERACTIONS)
