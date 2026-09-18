@@ -1,6 +1,7 @@
 import pytest
 
 from game import bartender_dialogue
+from game import interactions as interaction_module
 from game.game import Game
 from game.items import Item
 
@@ -251,3 +252,56 @@ def test_secret_beast_routes_stay_hidden_from_cave_prompt(capsys):
     assert "pound chest" in output
     assert "pet beast" not in output
     assert "beast drink" not in output
+
+
+def test_beast_second_wave_has_35_new_rules():
+    assert hasattr(interaction_module, "BEAST_STATIC_INTERACTIONS")
+    assert hasattr(interaction_module, "BEAST_STATE_INTERACTIONS")
+    assert (
+        len(interaction_module.BEAST_STATIC_INTERACTIONS)
+        + len(interaction_module.BEAST_STATE_INTERACTIONS)
+        >= 35
+    )
+
+
+def test_poke_beast_changes_across_hostile_thirsty_sleeping_states(capsys):
+    hostile = Game()
+    put_in_live_beast_cave(hostile)
+    hostile.handle_command("poke beast")
+    hostile_output = capsys.readouterr().out.lower()
+    assert hostile.running is False
+    assert "maul" in hostile_output or "lose" in hostile_output
+
+    thirsty = Game()
+    put_in_live_beast_cave(thirsty)
+    thirsty.beasts_thirsty = True
+    thirsty.beast_pet_count = 2
+    thirsty.handle_command("poke beast")
+    thirsty_output = capsys.readouterr().out.lower()
+    assert thirsty.running is True
+    assert "thirst" in thirsty_output or "dry" in thirsty_output or "water" in thirsty_output
+
+    sleeping = Game()
+    put_in_live_beast_cave(sleeping)
+    sleeping.cave_battle_done = True
+    sleeping.beasts_asleep = True
+    sleeping.handle_command("poke beast")
+    sleeping_output = capsys.readouterr().out.lower()
+    assert sleeping.running is True
+    assert "sleep" in sleeping_output or "cuddle" in sleeping_output or "paw" in sleeping_output
+
+
+def test_impossible_drink_on_thirsty_beasts_is_bespoke_but_not_the_beast_drink_win(capsys):
+    game = Game()
+    put_in_live_beast_cave(game)
+    game.beasts_thirsty = True
+    game.beast_pet_count = 2
+    game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+
+    game.handle_command("use impossible drink on beast")
+    output = capsys.readouterr().out.lower()
+
+    assert "reality" in output
+    assert "dry" in output or "thirst" in output
+    assert game.cave_battle_done is False
+    assert game._has_inventory_item("impossible drink")
