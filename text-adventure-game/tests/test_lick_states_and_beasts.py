@@ -305,3 +305,16 @@ def test_impossible_drink_on_thirsty_beasts_is_bespoke_but_not_the_beast_drink_w
     assert "dry" in output or "thirst" in output
     assert game.cave_battle_done is False
     assert game._has_inventory_item("impossible drink")
+
+
+def test_thirsty_beast_inspection_uses_state_pack(capsys):
+    game = Game()
+    put_in_live_beast_cave(game)
+    game.beasts_thirsty = True
+    game.beast_pet_count = 2
+
+    game.handle_command("inspect beast")
+    output = capsys.readouterr().out.lower()
+
+    assert "customer" in output
+    assert game.running is True
