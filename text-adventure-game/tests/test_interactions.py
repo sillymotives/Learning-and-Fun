@@ -325,3 +325,20 @@ def test_impossible_drink_on_bartender_is_bespoke_and_preserved(capsys):
 
     assert "impossible" in output or "reality" in output
     assert game._has_inventory_item("impossible drink")
+
+
+def test_cellar_second_wave_has_10_new_rules():
+    assert hasattr(interaction_module, "CELLAR_STATIC_INTERACTIONS")
+    assert len(interaction_module.CELLAR_STATIC_INTERACTIONS) >= 10
+
+
+def test_cellar_impossible_drink_interaction_is_bespoke(capsys):
+    game = Game()
+    game.current_room = "root_cellar"
+    game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+
+    game.handle_command("use impossible drink on cask")
+    output = capsys.readouterr().out.lower()
+
+    assert "ferment" in output or "causality" in output
+    assert game._has_inventory_item("impossible drink")
