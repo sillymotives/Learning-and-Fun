@@ -766,13 +766,6 @@ class Game:
             self._record_optional_interaction(verb, None, target)
             return True
 
-        if verb == "inspect":
-            print("You study the two cave beasts instead of immediately making a worse decision.")
-            print("Too many teeth. Too many bright eyes. Huge paws. Dry tongues.")
-            print("One of them watches your hands with suspicious concentration.")
-            self._record_optional_interaction(verb, None, target)
-            return True
-
         if verb == "pet":
             if self.beast_pet_count == 0:
                 self.beast_pet_count = 1
@@ -805,6 +798,13 @@ class Game:
         )
         if lines:
             self._print_interaction_lines(lines)
+            self._record_optional_interaction(verb, None, target)
+            return True
+
+        if verb == "inspect":
+            print("You study the two cave beasts instead of immediately making a worse decision.")
+            print("Too many teeth. Too many bright eyes. Huge paws. Dry tongues.")
+            print("One of them watches your hands with suspicious concentration.")
             self._record_optional_interaction(verb, None, target)
             return True
 
