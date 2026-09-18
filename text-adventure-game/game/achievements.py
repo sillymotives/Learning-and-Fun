@@ -4,4 +4,5 @@ ACHIEVEMENTS = {
     "attempted_capitalism_on_stone": "Attempted Capitalism On Stone",
     "applied_science": "Applied Science",
     "training_arc": "Training Arc",
+    "longitudinal_study": "Longitudinal Study",
 }
