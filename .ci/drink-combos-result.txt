@@ -1,51 +1,33 @@
-commit=30a772ed56a389792937d586227204805066cb7f
+commit=af70a3fa25acec1f6d1e0b8d655791d894f62ef9
 install_code=0
 compile_code=0
 pytest_code=1
 diff_code=0
 --- pytest ---
-........................................................................ [ 59%]
-...............FFF...............................                        [100%]
+.................................................................F...... [ 59%]
+.............F...................................                        [100%]
 =================================== FAILURES ===================================
-___________________ test_tavern_second_wave_has_45_new_rules ___________________
+_________________ test_static_interaction_pack_is_large_enough _________________
 
-    def test_tavern_second_wave_has_45_new_rules():
->       assert hasattr(interaction_module, "TAVERN_STATIC_INTERACTIONS")
-E       AssertionError: assert False
-E        +  where False = hasattr(interaction_module, 'TAVERN_STATIC_INTERACTIONS')
+    def test_static_interaction_pack_is_large_enough():
+>       assert 160 <= len(STATIC_INTERACTIONS) <= 190
+E       assert 192 <= 190
+E        +  where 192 = len({('rub', 'drink', 'bartender face', 'tavern'): ("You scoop up a heroic quantity of ale and rub it directly into the ba...u press a coin against the tavern wall and wait for capitalism to happen.', 'The wall declines the transaction.'), ...})
 
-tests/test_interactions.py:278: AssertionError
-______________ test_state_interaction_prefers_most_specific_flags ______________
+tests/test_interactions.py:21: AssertionError
+_______________ test_expanded_interaction_pack_has_real_density ________________
 
-    def test_state_interaction_prefers_most_specific_flags():
->       assert hasattr(interaction_module, "get_state_interaction")
-E       AssertionError: assert False
-E        +  where False = hasattr(interaction_module, 'get_state_interaction')
+    def test_expanded_interaction_pack_has_real_density():
+>       assert 160 <= len(STATIC_INTERACTIONS) <= 190
+E       assert 192 <= 190
+E        +  where 192 = len({('rub', 'drink', 'bartender face', 'tavern'): ("You scoop up a heroic quantity of ale and rub it directly into the ba...u press a coin against the tavern wall and wait for capitalism to happen.', 'The wall declines the transaction.'), ...})
 
-tests/test_interactions.py:288: AssertionError
-______________ test_damp_bootless_bartender_pet_beats_generic_pet ______________
-
-capsys = <_pytest.capture.CaptureFixture object at 0x7f6c649e96a0>
-
-    def test_damp_bootless_bartender_pet_beats_generic_pet(capsys):
-        game = Game()
-        game.bartender_boot_stolen = True
-        game.bartender_extinguished = True
-        game.bartender_was_extinguished = True
-    
-        game.handle_command("pet bartender")
-        output = capsys.readouterr().out.lower()
-    
->       assert "boot" in output or "sock" in output
-E       AssertionError: assert ('boot' in 'you reach out and pet the bartender once. he looks at your hand, then at you. no further guidance is offered.\n' or 'sock' in 'you reach out and pet the bartender once. he looks at your hand, then at you. no further guidance is offered.\n')
-
-tests/test_interactions.py:314: AssertionError
+tests/test_interactions.py:256: AssertionError
 =========================== short test summary info ============================
-FAILED tests/test_interactions.py::test_tavern_second_wave_has_45_new_rules - AssertionError: assert False
- +  where False = hasattr(interaction_module, 'TAVERN_STATIC_INTERACTIONS')
-FAILED tests/test_interactions.py::test_state_interaction_prefers_most_specific_flags - AssertionError: assert False
- +  where False = hasattr(interaction_module, 'get_state_interaction')
-FAILED tests/test_interactions.py::test_damp_bootless_bartender_pet_beats_generic_pet - AssertionError: assert ('boot' in 'you reach out and pet the bartender once. he looks at your hand, then at you. no further guidance is offered.\n' or 'sock' in 'you reach out and pet the bartender once. he looks at your hand, then at you. no further guidance is offered.\n')
-3 failed, 118 passed in 0.36s
+FAILED tests/test_interactions.py::test_static_interaction_pack_is_large_enough - assert 192 <= 190
+ +  where 192 = len({('rub', 'drink', 'bartender face', 'tavern'): ("You scoop up a heroic quantity of ale and rub it directly into the ba...u press a coin against the tavern wall and wait for capitalism to happen.', 'The wall declines the transaction.'), ...})
+FAILED tests/test_interactions.py::test_expanded_interaction_pack_has_real_density - assert 192 <= 190
+ +  where 192 = len({('rub', 'drink', 'bartender face', 'tavern'): ("You scoop up a heroic quantity of ale and rub it directly into the ba...u press a coin against the tavern wall and wait for capitalism to happen.', 'The wall declines the transaction.'), ...})
+2 failed, 119 passed in 0.26s
 --- compile ---
 --- diff ---
