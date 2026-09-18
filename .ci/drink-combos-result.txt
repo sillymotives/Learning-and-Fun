@@ -1,11 +1,40 @@
-commit=8a7fd8b849eb01211f8e8a5aa0b2e3bb9c65abdd
+commit=3125a804dd2a2da000e692a94bc7b5fca8c40b83
 install_code=0
 compile_code=0
-pytest_code=0
+pytest_code=1
 diff_code=0
 --- pytest ---
-........................................................................ [ 58%]
-....................................................                     [100%]
-124 passed in 0.34s
+........................................................................ [ 57%]
+...................FF.................................                   [100%]
+=================================== FAILURES ===================================
+___________________ test_cellar_second_wave_has_10_new_rules ___________________
+
+    def test_cellar_second_wave_has_10_new_rules():
+>       assert hasattr(interaction_module, "CELLAR_STATIC_INTERACTIONS")
+E       AssertionError: assert False
+E        +  where False = hasattr(interaction_module, 'CELLAR_STATIC_INTERACTIONS')
+
+tests/test_interactions.py:331: AssertionError
+_____________ test_cellar_impossible_drink_interaction_is_bespoke ______________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x7f26c0812480>
+
+    def test_cellar_impossible_drink_interaction_is_bespoke(capsys):
+        game = Game()
+        game.current_room = "root_cellar"
+        game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+    
+        game.handle_command("use impossible drink on cask")
+        output = capsys.readouterr().out.lower()
+    
+>       assert "ferment" in output or "causality" in output
+E       AssertionError: assert ('ferment' in 'you use the impossible drink on the cask.\nthe cellar is damp, silent, and somehow more judgmental now.\n' or 'causality' in 'you use the impossible drink on the cask.\nthe cellar is damp, silent, and somehow more judgmental now.\n')
+
+tests/test_interactions.py:343: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_interactions.py::test_cellar_second_wave_has_10_new_rules - AssertionError: assert False
+ +  where False = hasattr(interaction_module, 'CELLAR_STATIC_INTERACTIONS')
+FAILED tests/test_interactions.py::test_cellar_impossible_drink_interaction_is_bespoke - AssertionError: assert ('ferment' in 'you use the impossible drink on the cask.\nthe cellar is damp, silent, and somehow more judgmental now.\n' or 'causality' in 'you use the impossible drink on the cask.\nthe cellar is damp, silent, and somehow more judgmental now.\n')
+2 failed, 124 passed in 0.37s
 --- compile ---
 --- diff ---
