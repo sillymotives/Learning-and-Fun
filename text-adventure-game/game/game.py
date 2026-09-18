@@ -11,6 +11,8 @@ from .interactions import (
     GENERIC_FALLBACKS,
     ROOM_FALLBACKS,
     ROOM_TARGETS,
+    TAVERN_STATE_INTERACTIONS,
+    get_state_interaction,
     get_static_interaction,
     normalize_item,
     normalize_target,
@@ -899,6 +901,18 @@ class Game:
             self.flavour_counts[counter_key] = index + 1
             self._record_optional_interaction(verb, None, target)
             return
+        if self.current_room == "tavern" and target in {"bartender", "bartender face"}:
+            lines = get_state_interaction(
+                TAVERN_STATE_INTERACTIONS,
+                self._bartender_flags(),
+                verb,
+                None,
+                target,
+            )
+            if lines:
+                self._print_interaction_lines(lines)
+                self._record_optional_interaction(verb, None, target)
+                return
         if target in {"map", "crumpled map"}:
             if not self._owns_map():
                 print("You do not have a map to bother.")
@@ -1037,6 +1051,19 @@ class Game:
 
         if self._handle_stateful_interaction(action, item, target):
             return
+
+        if self.current_room == "tavern" and target in {"bartender", "bartender face"}:
+            lines = get_state_interaction(
+                TAVERN_STATE_INTERACTIONS,
+                self._bartender_flags(),
+                action,
+                item,
+                target,
+            )
+            if lines:
+                self._print_interaction_lines(lines)
+                self._record_optional_interaction(action, item, target)
+                return
 
         overlay = bartender_interaction_overlay(self._bartender_flags(), action, item, target)
         if overlay:
