@@ -1,9 +1,11 @@
+from game import interactions as interaction_module
 from game.interactions import (
     STATIC_INTERACTIONS,
     normalize_item,
     normalize_target,
     normalize_verb,
 )
+from game.items import Item
 
 
 def test_interaction_alias_normalization():
@@ -270,3 +272,56 @@ def test_common_room_targets_have_multiple_bespoke_verbs():
                 if (verb, None, target, room) in STATIC_INTERACTIONS
             )
             assert count >= 3, (room, target, count)
+
+
+def test_tavern_second_wave_has_45_new_rules():
+    assert hasattr(interaction_module, "TAVERN_STATIC_INTERACTIONS")
+    assert hasattr(interaction_module, "TAVERN_STATE_INTERACTIONS")
+    assert (
+        len(interaction_module.TAVERN_STATIC_INTERACTIONS)
+        + len(interaction_module.TAVERN_STATE_INTERACTIONS)
+        >= 45
+    )
+
+
+def test_state_interaction_prefers_most_specific_flags():
+    assert hasattr(interaction_module, "get_state_interaction")
+    rules = {
+        (frozenset({"bootless"}), "pet", None, "bartender"): ("bootless",),
+        (frozenset({"bootless", "damp"}), "pet", None, "bartender"): ("specific",),
+    }
+
+    lines = interaction_module.get_state_interaction(
+        rules,
+        frozenset({"bootless", "damp", "was_extinguished"}),
+        "pet",
+        None,
+        "bartender",
+    )
+
+    assert lines == ("specific",)
+
+
+def test_damp_bootless_bartender_pet_beats_generic_pet(capsys):
+    game = Game()
+    game.bartender_boot_stolen = True
+    game.bartender_extinguished = True
+    game.bartender_was_extinguished = True
+
+    game.handle_command("pet bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert "boot" in output or "sock" in output
+    assert "damp" in output or "wet" in output
+    assert "reach out and pet" not in output
+
+
+def test_impossible_drink_on_bartender_is_bespoke_and_preserved(capsys):
+    game = Game()
+    game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+
+    game.handle_command("use impossible drink on bartender")
+    output = capsys.readouterr().out.lower()
+
+    assert "impossible" in output or "reality" in output
+    assert game._has_inventory_item("impossible drink")
