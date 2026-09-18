@@ -1,40 +1,11 @@
-commit=6dc5dcfa48db1a2a293d9b17b933ea8a94cffe84
+commit=2d5a7ae81783da28cc323983e6636ae7475be956
 install_code=0
 compile_code=0
-pytest_code=1
+pytest_code=0
 diff_code=0
 --- pytest ---
 ........................................................................ [ 56%]
-.....................FF.................................                 [100%]
-=================================== FAILURES ===================================
-___________________ test_forest_second_wave_has_10_new_rules ___________________
-
-    def test_forest_second_wave_has_10_new_rules():
->       assert hasattr(interaction_module, "FOREST_STATIC_INTERACTIONS")
-E       AssertionError: assert False
-E        +  where False = hasattr(interaction_module, 'FOREST_STATIC_INTERACTIONS')
-
-tests/test_interactions.py:348: AssertionError
-__________ test_impossible_drink_on_raiders_is_bespoke_and_preserved ___________
-
-capsys = <_pytest.capture.CaptureFixture object at 0x7f3a81c10b00>
-
-    def test_impossible_drink_on_raiders_is_bespoke_and_preserved(capsys):
-        game = Game()
-        game.current_room = "forest_path"
-        game.player.add_item(Item("Impossible Drink", "Reality gave up."))
-    
-        game.handle_command("use impossible drink on raiders")
-        output = capsys.readouterr().out.lower()
-    
->       assert "captain" in output
-E       AssertionError: assert 'captain' in 'you use the impossible drink on the raiders.\nthe forest has witnessed stranger things, but not recently.\n'
-
-tests/test_interactions.py:360: AssertionError
-=========================== short test summary info ============================
-FAILED tests/test_interactions.py::test_forest_second_wave_has_10_new_rules - AssertionError: assert False
- +  where False = hasattr(interaction_module, 'FOREST_STATIC_INTERACTIONS')
-FAILED tests/test_interactions.py::test_impossible_drink_on_raiders_is_bespoke_and_preserved - AssertionError: assert 'captain' in 'you use the impossible drink on the raiders.\nthe forest has witnessed stranger things, but not recently.\n'
-2 failed, 126 passed in 0.39s
+........................................................                 [100%]
+128 passed in 0.37s
 --- compile ---
 --- diff ---
