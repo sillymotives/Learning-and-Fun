@@ -1,4 +1,4 @@
-commit=de3179f012be94612a6af7689eca6a2fd00191b2
+commit=30a772ed56a389792937d586227204805066cb7f
 install_code=0
 compile_code=0
 pytest_code=1
@@ -25,7 +25,7 @@ E        +  where False = hasattr(interaction_module, 'get_state_interaction')
 tests/test_interactions.py:288: AssertionError
 ______________ test_damp_bootless_bartender_pet_beats_generic_pet ______________
 
-capsys = <_pytest.capture.CaptureFixture object at 0x7f9f8a95d9d0>
+capsys = <_pytest.capture.CaptureFixture object at 0x7f6c649e96a0>
 
     def test_damp_bootless_bartender_pet_beats_generic_pet(capsys):
         game = Game()
@@ -46,6 +46,6 @@ FAILED tests/test_interactions.py::test_tavern_second_wave_has_45_new_rules - As
 FAILED tests/test_interactions.py::test_state_interaction_prefers_most_specific_flags - AssertionError: assert False
  +  where False = hasattr(interaction_module, 'get_state_interaction')
 FAILED tests/test_interactions.py::test_damp_bootless_bartender_pet_beats_generic_pet - AssertionError: assert ('boot' in 'you reach out and pet the bartender once. he looks at your hand, then at you. no further guidance is offered.\n' or 'sock' in 'you reach out and pet the bartender once. he looks at your hand, then at you. no further guidance is offered.\n')
-3 failed, 118 passed in 0.26s
+3 failed, 118 passed in 0.36s
 --- compile ---
 --- diff ---
