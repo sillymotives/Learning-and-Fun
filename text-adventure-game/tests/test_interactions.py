@@ -342,3 +342,22 @@ def test_cellar_impossible_drink_interaction_is_bespoke(capsys):
 
     assert "ferment" in output or "causality" in output
     assert game._has_inventory_item("impossible drink")
+
+
+def test_forest_second_wave_has_10_new_rules():
+    assert hasattr(interaction_module, "FOREST_STATIC_INTERACTIONS")
+    assert len(interaction_module.FOREST_STATIC_INTERACTIONS) >= 10
+
+
+def test_impossible_drink_on_raiders_is_bespoke_and_preserved(capsys):
+    game = Game()
+    game.current_room = "forest_path"
+    game.player.add_item(Item("Impossible Drink", "Reality gave up."))
+
+    game.handle_command("use impossible drink on raiders")
+    output = capsys.readouterr().out.lower()
+
+    assert "captain" in output
+    assert "impossible" in output or "reality" in output
+    assert game._has_inventory_item("impossible drink")
+    assert game.running is True
