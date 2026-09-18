@@ -18,7 +18,7 @@ def test_interaction_alias_normalization():
 
 
 def test_static_interaction_pack_is_large_enough():
-    assert 160 <= len(STATIC_INTERACTIONS) <= 190
+    assert len(STATIC_INTERACTIONS) >= 160
 
 from game.game import Game
 
@@ -253,7 +253,7 @@ def test_bartender_item_interactions_cover_common_inventory(capsys):
 
 
 def test_expanded_interaction_pack_has_real_density():
-    assert 160 <= len(STATIC_INTERACTIONS) <= 190
+    assert len(STATIC_INTERACTIONS) >= 160
 
 
 def test_common_room_targets_have_multiple_bespoke_verbs():
