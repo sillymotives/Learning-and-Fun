@@ -1,11 +1,43 @@
-commit=2d5a7ae81783da28cc323983e6636ae7475be956
+commit=f73ba260bbd7d0858ff4c42d733e3659122c178a
 install_code=0
 compile_code=0
-pytest_code=0
+pytest_code=1
 diff_code=0
 --- pytest ---
-........................................................................ [ 56%]
-........................................................                 [100%]
-128 passed in 0.37s
+........................................................................ [ 54%]
+.......................FFF.................................              [100%]
+=================================== FAILURES ===================================
+_____________ test_second_wave_contains_at_least_100_new_rule_keys _____________
+
+    def test_second_wave_contains_at_least_100_new_rule_keys():
+>       assert hasattr(interaction_module, "SECOND_WAVE_RULE_COUNT")
+E       AssertionError: assert False
+E        +  where False = hasattr(interaction_module, 'SECOND_WAVE_RULE_COUNT')
+
+tests/test_interactions.py:367: AssertionError
+___________ test_second_wave_static_keys_do_not_replace_legacy_jokes ___________
+
+    def test_second_wave_static_keys_do_not_replace_legacy_jokes():
+>       assert hasattr(interaction_module, "LEGACY_INTERACTION_KEYS")
+E       AssertionError: assert False
+E        +  where False = hasattr(interaction_module, 'LEGACY_INTERACTION_KEYS')
+
+tests/test_interactions.py:372: AssertionError
+__________ test_second_wave_static_packs_do_not_duplicate_each_other ___________
+
+    def test_second_wave_static_packs_do_not_duplicate_each_other():
+>       assert hasattr(interaction_module, "SECOND_WAVE_STATIC_INTERACTIONS")
+E       AssertionError: assert False
+E        +  where False = hasattr(interaction_module, 'SECOND_WAVE_STATIC_INTERACTIONS')
+
+tests/test_interactions.py:380: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_interactions.py::test_second_wave_contains_at_least_100_new_rule_keys - AssertionError: assert False
+ +  where False = hasattr(interaction_module, 'SECOND_WAVE_RULE_COUNT')
+FAILED tests/test_interactions.py::test_second_wave_static_keys_do_not_replace_legacy_jokes - AssertionError: assert False
+ +  where False = hasattr(interaction_module, 'LEGACY_INTERACTION_KEYS')
+FAILED tests/test_interactions.py::test_second_wave_static_packs_do_not_duplicate_each_other - AssertionError: assert False
+ +  where False = hasattr(interaction_module, 'SECOND_WAVE_STATIC_INTERACTIONS')
+3 failed, 128 passed in 0.30s
 --- compile ---
 --- diff ---
