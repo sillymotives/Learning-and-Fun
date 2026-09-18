@@ -252,6 +252,8 @@ def get_state_interaction(rules, flags, verb, item, target):
 # The core registry stays readable; larger content waves live in focused packs.
 from .flavour_expansion import EXTRA_INTERACTIONS
 from .flavour_tavern import TAVERN_STATIC_INTERACTIONS, TAVERN_STATE_INTERACTIONS
+from .flavour_beasts import BEAST_STATIC_INTERACTIONS, BEAST_STATE_INTERACTIONS
 
 STATIC_INTERACTIONS.update(EXTRA_INTERACTIONS)
 STATIC_INTERACTIONS.update(TAVERN_STATIC_INTERACTIONS)
+STATIC_INTERACTIONS.update(BEAST_STATIC_INTERACTIONS)
