@@ -8,6 +8,7 @@ from .player import Player
 from .world import Room
 from .achievements import ACHIEVEMENTS
 from .interactions import (
+    BEAST_STATE_INTERACTIONS,
     GENERIC_FALLBACKS,
     ROOM_FALLBACKS,
     ROOM_TARGETS,
@@ -698,11 +699,34 @@ class Game:
         self.running = False
         self.state = "game over"
 
+    def _beast_flavour_flags(self):
+        flags = set()
+        if self.beasts_asleep:
+            flags.add("beasts_asleep")
+        elif self.beasts_thirsty:
+            flags.add("beasts_thirsty")
+        else:
+            flags.add("beasts_hostile")
+        if self.beast_pet_count > 0:
+            flags.add("beasts_petted")
+        return frozenset(flags)
+
     def _handle_beast_flavour(self, verb, target):
         if self.current_room != "cave_chamber" or target != "beasts":
             return False
 
         if self.beasts_asleep:
+            lines = get_state_interaction(
+                BEAST_STATE_INTERACTIONS,
+                self._beast_flavour_flags(),
+                verb,
+                None,
+                target,
+            )
+            if lines:
+                self._print_interaction_lines(lines)
+                self._record_optional_interaction(verb, None, target)
+                return True
             sleepy = {
                 "inspect": (
                     "The two enormous cave beasts are curled together in the corner, fast asleep.",
@@ -772,6 +796,18 @@ class Game:
             self._record_optional_interaction(verb, None, target)
             return True
 
+        lines = get_state_interaction(
+            BEAST_STATE_INTERACTIONS,
+            self._beast_flavour_flags(),
+            verb,
+            None,
+            target,
+        )
+        if lines:
+            self._print_interaction_lines(lines)
+            self._record_optional_interaction(verb, None, target)
+            return True
+
         if verb == "poke":
             self._record_optional_interaction(verb, None, target)
             self._beast_death(
@@ -821,6 +857,17 @@ class Game:
             return False
 
         if self.beasts_asleep:
+            lines = get_state_interaction(
+                BEAST_STATE_INTERACTIONS,
+                self._beast_flavour_flags(),
+                verb,
+                item,
+                target,
+            )
+            if lines:
+                self._print_interaction_lines(lines)
+                self._record_optional_interaction(verb, item, target)
+                return True
             print(f"You carefully {verb} the {item} near the sleeping beasts.")
             print("Neither wakes. One tiny ear flicks, which is more response than this plan deserves.")
             self._record_optional_interaction(verb, item, target)
@@ -880,6 +927,18 @@ class Game:
         if item == "coin":
             print("You offer a coin to the beasts.")
             print("One paws it once, decides it has terrible nutritional value, and returns to considering you instead.")
+            self._record_optional_interaction(verb, item, target)
+            return True
+
+        lines = get_state_interaction(
+            BEAST_STATE_INTERACTIONS,
+            self._beast_flavour_flags(),
+            verb,
+            item,
+            target,
+        )
+        if lines:
+            self._print_interaction_lines(lines)
             self._record_optional_interaction(verb, item, target)
             return True
 
