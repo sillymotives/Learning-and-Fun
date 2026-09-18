@@ -115,7 +115,9 @@ The migration workflow must checkout this named branch, because it contains the 
 
 - [ ] **Step 3: Create the temporary migration workflow in the destination**
 
-Create .github/workflows/migrate-game-history.yml on destination main with exactly this shape:
+Create .github/workflows/migrate-game-history.yml as the destination's bootstrap commit. If the empty repository has no resolvable main ref yet, create the file without an explicit branch argument so GitHub creates the default main branch; otherwise target main normally.
+
+Use exactly this workflow shape:
 
 ~~~yaml
 name: Migrate game history
@@ -305,6 +307,12 @@ def test_explicit_speaker_must_be_present(capsys):
 
     game.current_room = "tavern"
     game.handle_command("speak beasts")
+    assert "not here" in capsys.readouterr().out.lower()
+
+    game.current_room = "forest_path"
+    game.raiders_seen = False
+    game.raiders_defeated = False
+    game.handle_command("speak raiders")
     assert "not here" in capsys.readouterr().out.lower()
 
 
@@ -556,7 +564,8 @@ Add methods:
             return
 
         if speaker == "raiders":
-            if self.current_room != "forest_path":
+            raiders_present = self.raiders_seen or self.raiders_defeated or self.treasure_found
+            if self.current_room != "forest_path" or not raiders_present:
                 print("The raiders are not here.")
                 return
             state = self._raider_speech_state()
@@ -685,7 +694,8 @@ def test_run_command_appends_only_new_output():
 
     result = store.run_command("alpha", "inventory")
 
-    assert len(result["lines"]) > 0
+    assert result["lines"][0] == "> inventory"
+    assert any("coins:" in line.lower() for line in result["lines"])
     assert len(result["transcript"]) > original_length
     assert result["transcript"][-len(result["lines"]):] == result["lines"]
     assert result["running"] is True
@@ -743,35 +753,40 @@ class GameSessionStore:
         return BrowserGameSession(game=game, transcript=list(lines))
 
     def get_or_create(self, session_id):
-        if session_id not in self._sessions:
-            self._sessions[session_id] = self._new_session()
-        return self._sessions[session_id]
+        with OUTPUT_LOCK:
+            if session_id not in self._sessions:
+                self._sessions[session_id] = self._new_session()
+            return self._sessions[session_id]
 
     def run_command(self, session_id, command):
-        browser_session = self.get_or_create(session_id)
-        lines = _captured_lines(lambda: browser_session.game.handle_command(command))
-        browser_session.transcript.extend(lines)
-        return {
-            "lines": lines,
-            "transcript": list(browser_session.transcript),
-            "running": browser_session.game.running,
-            "state": browser_session.game.state,
-            "victory": browser_session.game.victory,
-        }
+        with OUTPUT_LOCK:
+            browser_session = self.get_or_create(session_id)
+            output_lines = _captured_lines(lambda: browser_session.game.handle_command(command))
+            lines = [f"> {command}", *output_lines]
+            browser_session.transcript.extend(lines)
+            return {
+                "lines": lines,
+                "transcript": list(browser_session.transcript),
+                "running": browser_session.game.running,
+                "state": browser_session.game.state,
+                "victory": browser_session.game.victory,
+            }
 
     def reset(self, session_id):
-        browser_session = self._new_session()
-        self._sessions[session_id] = browser_session
-        return {
-            "lines": list(browser_session.transcript),
-            "transcript": list(browser_session.transcript),
-            "running": browser_session.game.running,
-            "state": browser_session.game.state,
-            "victory": browser_session.game.victory,
-        }
+        with OUTPUT_LOCK:
+            browser_session = self._new_session()
+            self._sessions[session_id] = browser_session
+            return {
+                "lines": list(browser_session.transcript),
+                "transcript": list(browser_session.transcript),
+                "running": browser_session.game.running,
+                "state": browser_session.game.state,
+                "victory": browser_session.game.victory,
+            }
 
     def drop(self, session_id):
-        self._sessions.pop(session_id, None)
+        with OUTPUT_LOCK:
+            self._sessions.pop(session_id, None)
 ~~~
 
 - [ ] **Step 5: Add failing isolation/reset tests**
@@ -1180,6 +1195,52 @@ def test_blank_command_is_rejected_without_growing_transcript():
     assert response.get_json()["error"] == "command is required"
     after = client.get("/").data
     assert after == before
+
+
+def test_malformed_json_is_rejected():
+    client = make_test_app().test_client()
+    login(client)
+
+    response = client.post(
+        "/api/command",
+        data="{not-json",
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "JSON body required"
+
+
+def test_unknown_game_command_is_normal_game_output():
+    client = make_test_app().test_client()
+    login(client)
+
+    response = client.post("/api/command", json={"command": "xyzzy"})
+
+    assert response.status_code == 200
+    assert any("unknown command" in line.lower() for line in response.get_json()["lines"])
+
+
+@pytest.mark.parametrize("command", ["help", "look", "inventory"])
+def test_standard_commands_work_through_http(command):
+    client = make_test_app().test_client()
+    login(client)
+
+    response = client.post("/api/command", json={"command": command})
+
+    assert response.status_code == 200
+    assert len(response.get_json()["lines"]) >= 2
+
+
+def test_game_over_status_is_returned_through_http():
+    client = make_test_app().test_client()
+    login(client)
+
+    response = client.post("/api/command", json={"command": "quit"})
+    payload = response.get_json()
+
+    assert payload["running"] is False
+    assert payload["state"] == "game over"
 ~~~
 
 - [ ] **Step 2: Run API tests and confirm RED**
@@ -1214,16 +1275,24 @@ Inside create_app():
         if not command:
             return jsonify({"error": "command is required"}), 400
 
-        result = app.extensions["game_store"].run_command(
-            current_game_session_id(),
-            command,
-        )
+        try:
+            result = app.extensions["game_store"].run_command(
+                current_game_session_id(),
+                command,
+            )
+        except Exception:
+            app.logger.exception("Game command failed")
+            return jsonify({"error": "The tavern connection failed."}), 500
         return jsonify(result)
 
     @app.post("/api/reset")
     @require_auth
     def api_reset():
-        result = app.extensions["game_store"].reset(current_game_session_id())
+        try:
+            result = app.extensions["game_store"].reset(current_game_session_id())
+        except Exception:
+            app.logger.exception("Game reset failed")
+            return jsonify({"error": "The tavern connection failed."}), 500
         return jsonify(result)
 ~~~
 
@@ -1275,7 +1344,24 @@ def test_transcript_survives_page_refresh_in_same_process():
 
     page = client.get("/")
 
+    assert b"&gt; inventory" in page.data
     assert b"Coins:" in page.data
+
+
+def test_internal_game_error_is_logged_but_redacted(monkeypatch):
+    app = make_test_app()
+    client = app.test_client()
+    login(client)
+
+    def explode(*args, **kwargs):
+        raise RuntimeError("private stack detail")
+
+    monkeypatch.setattr(app.extensions["game_store"], "run_command", explode)
+    response = client.post("/api/command", json={"command": "look"})
+
+    assert response.status_code == 500
+    assert response.get_json() == {"error": "The tavern connection failed."}
+    assert b"private stack detail" not in response.data
 ~~~
 
 - [ ] **Step 5: Run API/isolation tests and confirm GREEN**
@@ -1468,7 +1554,9 @@ function setBusy(busy) {
 function appendLines(lines) {
   lines.forEach((line) => {
     const row = document.createElement("div");
-    row.className = "transcript-line";
+    row.className = line.startsWith("> ")
+      ? "transcript-line command-echo"
+      : "transcript-line";
     row.textContent = line;
     transcript.appendChild(row);
   });
@@ -1494,10 +1582,6 @@ async function sendCommand(command) {
       throw new Error(payload.error || "Command failed.");
     }
 
-    const echo = document.createElement("div");
-    echo.className = "transcript-line command-echo";
-    echo.textContent = "> " + cleaned;
-    transcript.appendChild(echo);
     appendLines(payload.lines);
 
     if (payload.victory) {
