@@ -24,6 +24,8 @@ ITEM_ALIASES = {
     "beast ale": "beast drink",
     "cave drink": "beast drink",
     "monster drink": "beast drink",
+    "impossible": "impossible drink",
+    "impossible drink": "impossible drink",
 }
 
 TARGET_ALIASES = {
