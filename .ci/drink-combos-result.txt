@@ -1,67 +1,11 @@
-commit=db922653253312ed35b86b6d7555721da48a12b4
+commit=8a7fd8b849eb01211f8e8a5aa0b2e3bb9c65abdd
 install_code=0
 compile_code=0
-pytest_code=1
+pytest_code=0
 diff_code=0
 --- pytest ---
 ........................................................................ [ 58%]
-....................................FFF.............                     [100%]
-=================================== FAILURES ===================================
-___________________ test_beast_second_wave_has_35_new_rules ____________________
-
-    def test_beast_second_wave_has_35_new_rules():
->       assert hasattr(interaction_module, "BEAST_STATIC_INTERACTIONS")
-E       AssertionError: assert False
-E        +  where False = hasattr(interaction_module, 'BEAST_STATIC_INTERACTIONS')
-
-tests/test_lick_states_and_beasts.py:258: AssertionError
-________ test_poke_beast_changes_across_hostile_thirsty_sleeping_states ________
-
-capsys = <_pytest.capture.CaptureFixture object at 0x7fa1875c7f80>
-
-    def test_poke_beast_changes_across_hostile_thirsty_sleeping_states(capsys):
-        hostile = Game()
-        put_in_live_beast_cave(hostile)
-        hostile.handle_command("poke beast")
-        hostile_output = capsys.readouterr().out.lower()
-        assert hostile.running is False
-        assert "maul" in hostile_output or "lose" in hostile_output
-    
-        thirsty = Game()
-        put_in_live_beast_cave(thirsty)
-        thirsty.beasts_thirsty = True
-        thirsty.beast_pet_count = 2
-        thirsty.handle_command("poke beast")
-        thirsty_output = capsys.readouterr().out.lower()
->       assert thirsty.running is True
-E       assert False is True
-E        +  where False = <game.game.Game object at 0x7fa1875c72f0>.running
-
-tests/test_lick_states_and_beasts.py:281: AssertionError
-_ test_impossible_drink_on_thirsty_beasts_is_bespoke_but_not_the_beast_drink_win _
-
-capsys = <_pytest.capture.CaptureFixture object at 0x7fa18746bc20>
-
-    def test_impossible_drink_on_thirsty_beasts_is_bespoke_but_not_the_beast_drink_win(capsys):
-        game = Game()
-        put_in_live_beast_cave(game)
-        game.beasts_thirsty = True
-        game.beast_pet_count = 2
-        game.player.add_item(Item("Impossible Drink", "Reality gave up."))
-    
-        game.handle_command("use impossible drink on beast")
-        output = capsys.readouterr().out.lower()
-    
->       assert "reality" in output
-E       AssertionError: assert 'reality' in 'you use the impossible drink on the beasts.\nthe cave tolerates your experiment without endorsing it.\n'
-
-tests/test_lick_states_and_beasts.py:304: AssertionError
-=========================== short test summary info ============================
-FAILED tests/test_lick_states_and_beasts.py::test_beast_second_wave_has_35_new_rules - AssertionError: assert False
- +  where False = hasattr(interaction_module, 'BEAST_STATIC_INTERACTIONS')
-FAILED tests/test_lick_states_and_beasts.py::test_poke_beast_changes_across_hostile_thirsty_sleeping_states - assert False is True
- +  where False = <game.game.Game object at 0x7fa1875c72f0>.running
-FAILED tests/test_lick_states_and_beasts.py::test_impossible_drink_on_thirsty_beasts_is_bespoke_but_not_the_beast_drink_win - AssertionError: assert 'reality' in 'you use the impossible drink on the beasts.\nthe cave tolerates your experiment without endorsing it.\n'
-3 failed, 121 passed in 0.38s
+....................................................                     [100%]
+124 passed in 0.34s
 --- compile ---
 --- diff ---
