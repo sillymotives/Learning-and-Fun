@@ -1,0 +1,31 @@
+commit=9cc30c25c2b2907d1ba9084110f89b256de420aa
+install_code=0
+compile_code=0
+pytest_code=1
+diff_code=0
+--- pytest ---
+........................................................................ [ 53%]
+................................................F.............           [100%]
+=================================== FAILURES ===================================
+________________ test_thirsty_beast_inspection_uses_state_pack _________________
+
+capsys = <_pytest.capture.CaptureFixture object at 0x7f2e4444ec60>
+
+    def test_thirsty_beast_inspection_uses_state_pack(capsys):
+        game = Game()
+        put_in_live_beast_cave(game)
+        game.beasts_thirsty = True
+        game.beast_pet_count = 2
+    
+        game.handle_command("inspect beast")
+        output = capsys.readouterr().out.lower()
+    
+>       assert "customer" in output
+E       AssertionError: assert 'customer' in 'you study the two cave beasts instead of immediately making a worse decision.\ntoo many teeth. too many bright eyes. huge paws. dry tongues.\none of them watches your hands with suspicious concentration.\n'
+
+tests/test_lick_states_and_beasts.py:319: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_lick_states_and_beasts.py::test_thirsty_beast_inspection_uses_state_pack - AssertionError: assert 'customer' in 'you study the two cave beasts instead of immediately making a worse decision.\ntoo many teeth. too many bright eyes. huge paws. dry tongues.\none of them watches your hands with suspicious concentration.\n'
+1 failed, 133 passed in 0.41s
+--- compile ---
+--- diff ---
