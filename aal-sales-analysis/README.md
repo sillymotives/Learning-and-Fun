@@ -1,34 +1,43 @@
-# AAL Sales Analysis
+# AAL Sales Analysis (AI Engineering course project)
 
-Course-end project for **Applied Data Science with Python**, based on the AAL Q4 2020 Australian apparel sales dataset.
-
-## Start here: rubric-ordered notebook
-
-**[AAL_Sales_Analysis.ipynb](notebooks/AAL_Sales_Analysis.ipynb)** is the main working notebook. It follows the course rubric in the requested order.
+This course assignment analyses AAL's recorded Australian apparel sales in Q4 2020.
+The main Jupyter notebook follows the assignment rubric in order.
 
 | Section | Status |
 | --- | --- |
-| **1. Data Wrangling** (a–d) | Implemented and tested |
-| **2. Data Analysis** | Next |
-| **3. Data Visualization** | Later |
-| **4. Report Generation** | Last |
+| 1. Data Wrangling | Complete: validation, missing-day decision, Min-Max normalization, GroupBy |
+| 2. Data Analysis | Complete: descriptive statistics, group/state rankings, weekly/monthly/quarterly reports |
+| 3. Data Visualization | Not started |
+| 4. Report Generation | Not started |
 
-Section 1 covers missing and invalid value checks with `isna()`/`notna()`, a documented approach to handling missing records, Min-Max normalization of Unit and Sales, and `GroupBy()` with the grouping-vs-merging explanation.
+## Start here
 
-**[01_data_inspection.ipynb](notebooks/01_data_inspection.ipynb)** remains as a separate exploration notebook, preserving the initial analysis and visualization. It is *not* the final assignment structure.
+- `notebooks/AAL_Sales_Analysis.ipynb` - main notebook for Sections 1 and 2.
+- `notebooks/01_data_inspection.ipynb` - earlier exploratory work; kept unchanged.
+- `01_inspection_findings.md` - source checks and caveats.
+- `data/1739523823_ausapparalsales4thqrt2020.zip` - untouched original CSV archive.
+- `sales_analysis_problem_statement.docx` - untouched course instructions.
 
-## How to run
+## Run in JupyterLab
 
-- **In Simplilearn Practice Labs:** place `AAL_Sales_Analysis.ipynb` alongside `AusApparalSales4thQrt2020.csv` in JupyterLab's file browser. Open the notebook and run the cells in order.
-- **In a local copy of this project:** place the supplied ZIP in `data/`, open `notebooks/AAL_Sales_Analysis.ipynb` in JupyterLab, and run its cells.
+**Simplilearn Practice Labs:** upload `AAL_Sales_Analysis.ipynb` next to
+`AusApparalSales4thQrt2020.csv`. Open the notebook and select `Run All Cells`.
 
-The original input files (the course problem statement DOCX and CSV ZIP) were supplied in the conversation; they are **not currently committed** to this GitHub repository.
+**Local project:** open `notebooks/AAL_Sales_Analysis.ipynb` in JupyterLab.
+Its loader can read the original ZIP at `../data/` without extraction.
+Install Pandas and JupyterLab if your environment does not include them.
 
-## Data quality notes
+## Interpretation cautions
 
-- The original data has **7,560 rows** and no null cell values or duplicate business keys.
-- There are **no records for 31 October or 31 December 2020**. Possible holiday closure/altered trading is an **unverified hypothesis**, not a confirmed explanation; reporting gaps are also possible.
-- The original `Sales` values are always `Unit × 2,500`. Both normalized columns are therefore identical within floating-point precision.
-- The source does **not** specify sales currency, and ACT does not appear in its state/territory records.
+- The dataset has 7,560 records and omits 31 October and 31 December 2020.
+- Holiday-related closure is a hypothesis, not an established finding.
+- Source `Sales` currency is unspecified; do not assume AUD.
+- Every row follows `Sales = Unit x 2500`. Normalized Units/Sales therefore match.
+- The data includes seven geographic categories but no ACT, store counts or marketing spend.
+- Weekly reports use Monday-Sunday calendar weeks; first/last weeks cover partial Q4 periods.
 
-Additional inspection findings are in **[01_inspection_findings.md](01_inspection_findings.md)**. We will complete Sections 2–4 in order, with brief explanations accompanying each code cell.
+## GitHub
+
+https://github.com/sillymotives/Learning-and-Fun/tree/main/aal-sales-analysis
+
+Changes to Sections 1 and 2 are staged in draft PR #1, not merged into main.
