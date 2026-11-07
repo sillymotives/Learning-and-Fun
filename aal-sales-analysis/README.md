@@ -1,58 +1,42 @@
-# AAL Sales Analysis (AI Engineering course project)
+# AAL Sales Analysis | Applied Data Science with Python
 
-This course assignment analyses AAL's recorded Australian apparel sales in Q4 2020.
-The main Jupyter notebook follows the assignment rubric in order.
+**Status: Final course-end report complete.** This project analyses AAL's Q4 2020 clothing sales using the original course-provided training dataset. The required submission format is a JupyterLab notebook.
 
-| Section | Status |
-| --- | --- |
-| 1. Data Wrangling | Complete: validation, missing-day decision, Min-Max normalization, GroupBy |
-| 2. Data Analysis | Complete: descriptive statistics, state/group comparisons, regional demographic breakdown, weekly/monthly/quarterly reports, high/low sales-volume periods |
-| 3. Data Visualization | Complete: state/group/daypart plots, daily/weekly/monthly/quarterly charts, box plot, histogram, dashboard |
-| 4. Report Generation | Not started |
+## Primary report
 
-## Start here
+**[AAL_Sales_Analysis.ipynb](notebooks/AAL_Sales_Analysis.ipynb)** is the final, reproducible notebook, following the assignment rubric in strict order:
 
-- `notebooks/AAL_Sales_Analysis.ipynb` - main rubric-ordered notebook for Sections 1–3.
-- `notebooks/01_data_inspection.ipynb` - earlier exploratory work; kept unchanged.
-- `01_inspection_findings.md` - source checks and caveats.
-- `02_regional_demographic_findings.md` - demographic patterns in the lower-selling areas and decision cautions.
-- `02_spending_intensity_findings.md` - sales-volume comparisons, not customer-level spend.
-- `03_visualization_findings.md` - Section 3 chart inventory, takeaways and caveats.
-- `AAL_Section_3_Dashboard.png` - optional dashboard preview in the downloadable project package.
-- `data/1739523823_ausapparalsales4thqrt2020.zip` - untouched original CSV archive.
-- `sales_analysis_problem_statement.docx` - untouched course instructions.
+1. **Data Wrangling:** inspection with isna()/notna(), data validity, missing-date handling, Min-Max normalization and GroupBy explanation.
+2. **Data Analysis:** mean/median/mode/standard deviation, highest and lowest demographic and state totals, weekly/monthly/quarterly reports, regional and volume extensions.
+3. **Data Visualization:** state vs demographic, demographic across states, time of day, daily/weekly/monthly/quarterly charts, Seaborn box plot and histogram, four-panel dashboard.
+4. **Report Generation:** executive summary, methods, evidence tables, month/state analysis, targeted November promotional pilot, experimental evaluation, limitations and recommendations.
 
-## Run in JupyterLab
+For a brief business-facing conclusion, see **[04_final_executive_summary.md](04_final_executive_summary.md)**. The more detailed draft experiment rationale is in **[04_november_promotion_proposal.md](04_november_promotion_proposal.md)**.
 
-**Simplilearn Practice Labs:** upload `AAL_Sales_Analysis.ipynb` next to
-`AusApparalSales4thQrt2020.csv`. Open the notebook and select `Run All Cells`.
+## Running the notebook
 
-**Local project:** open `notebooks/AAL_Sales_Analysis.ipynb` in JupyterLab.
-Its loader can read the original ZIP at `../data/` without extraction.
-Install Pandas and JupyterLab if your environment does not include them.
+- **Simplilearn Practice Labs:** place `AAL_Sales_Analysis.ipynb` beside `AusApparalSales4thQrt2020.csv` and run all cells in JupyterLab.
+- **Local project folder:** put the supplied original ZIP `1739523823_ausapparalsales4thqrt2020.zip` in `data/` and open `notebooks/AAL_Sales_Analysis.ipynb`. The loader detects `../data/`.
+- The Python environment needs Pandas, Matplotlib, Seaborn, JupyterLab and a Python 3 kernel.
 
-## Interpretation cautions
+The GitHub notebook intentionally has **cleared execution outputs** to keep source reviewable. A separate complete downloadable package from the ChatGPT conversation includes the *executed* notebook, an offline HTML report, original untouched ZIP dataset, original course problem statement and an executive summary. The original course files are not published into this public GitHub repository.
 
-- The dataset has 7,560 records and omits 31 October and 31 December 2020.
-- Holiday-related closure is a hypothesis, not an established finding.
-- Source `Sales` currency is unspecified; do not assume AUD.
-- Every row follows `Sales = Unit x 2500`. Normalized Units/Sales therefore match.
-- The data includes seven geographic categories but no ACT, store counts or marketing spend.
-- Every group supplies about one-quarter of its state sales; no segment can be responsibly dropped based solely on revenue.
-- We do not have customer identifiers, receipts or transaction counts, so recorded-period volume is not average customer spend.
-- Weekly reports use Monday-Sunday calendar weeks; first/last weeks cover partial Q4 periods.
+## Evidence and analytical limits
 
-## GitHub
+- **7,560** recorded rows, **136,121** units and **340,302,500** recorded sales values; currency is unspecified.
+- **7** states/territories, **4** customer groups and **3** dayparts. There is no ACT data.
+- Every month has exactly **30** recorded days. The CSV lacks 31 October and 31 December 2020. Store closures are **not verified**, and missing days were not imputed or recorded as zero sales.
+- Every source row obeys `Sales = 2,500 x Unit`; these columns are proportional. The source contains no customer baskets, receipts, margins, store counts, footfall or historical campaign costs.
+- Victoria is the highest-sales state, WA the lowest; Men lead in demographic totals, Seniors are lowest; November has the lowest recorded monthly sales. Sales value alone cannot justify dropping a customer demographic or predict promotion profitability.
+- The business proposal is to **pilot, measure, and evaluate incremental contribution profit** from a targeted November campaign, guarding against any December sales displacement.
 
-https://github.com/sillymotives/Learning-and-Fun/pull/1
+## Other analysis notes
 
-Changes to Sections 1 and 2 are staged in draft PR #1, not merged into main.
-## Current status
+- [Initial inspection findings](01_inspection_findings.md)
+- [Regional demographic analysis](02_regional_demographic_findings.md)
+- [High/low recorded sales-volume analysis](02_spending_intensity_findings.md)
+- [Visualization findings](03_visualization_findings.md)
 
-**Section 3 is complete.** The Jupyter notebook includes a labelled four-panel dashboard and the required daily, weekly, monthly, and quarterly charts, with missing-date warnings. Section 4 (final report) remains to be completed.
+## Review status
 
-## Section 4 recommendation candidate
-
-The first agreed recommendation is a **controlled November promotion pilot**, potentially around Black Friday, with profitability, store-level controls and possible December sales displacement evaluated before rollout. This is a hypothesis to test, not an established cause of November's lower recorded revenue.
-
-See **[November promotion pilot recommendation](04_november_promotion_proposal.md)** for evidence, design, metrics and limitations. Section 4's final report remains **unfinished**.
+All four sections are complete and locally tested. The notebook was executed against the original input ZIP: **92 cells; 37 code cells; 11 rendered chart figures; zero execution errors**. A separate five-test report-validation suite passed. Changes remain in **[draft PR #1](https://github.com/sillymotives/Learning-and-Fun/pull/1)** until approved for merge.
