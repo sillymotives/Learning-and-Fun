@@ -1,36 +1,34 @@
 # AAL Sales Analysis
 
-Course-end project for **Applied Data Science with Python**.
+Course-end project for **Applied Data Science with Python**, based on the AAL Q4 2020 Australian apparel sales dataset.
 
-## Purpose
+## Start here: rubric-ordered notebook
 
-Analyse AAL's Australian clothing sales for Q4 2020, comparing states/territories, customer groups, and sales times. Support evidence-based recommendations for AAL's sales and marketing team.
+**[AAL_Sales_Analysis.ipynb](notebooks/AAL_Sales_Analysis.ipynb)** is the main working notebook. It follows the course rubric in the requested order.
 
-## Current work
+| Section | Status |
+| --- | --- |
+| **1. Data Wrangling** (a–d) | Implemented and tested |
+| **2. Data Analysis** | Next |
+| **3. Data Visualization** | Later |
+| **4. Report Generation** | Last |
 
-- [01 · Data inspection notebook](notebooks/01_data_inspection.ipynb): raw file loading, null checks, type validation, duplicate checks, calendar completeness, sales/units relationship, Pandas GroupBy, and the first Seaborn chart.
-- [Initial inspection findings](01_inspection_findings.md): verified figures and methodological cautions.
+Section 1 covers missing and invalid value checks with `isna()`/`notna()`, a documented approach to handling missing records, Min-Max normalization of Unit and Sales, and `GroupBy()` with the grouping-vs-merging explanation.
 
-**Status:** Data inspection complete. Further statistical analysis and dashboard development remain to be done.
+**[01_data_inspection.ipynb](notebooks/01_data_inspection.ipynb)** remains as a separate exploration notebook, preserving the initial analysis and visualization. It is *not* the final assignment structure.
 
-## Source materials
+## How to run
 
-The course provides two source files: `1739523775_sales_analysis_problem_statement.docx` and `1739523823_ausapparalsales4thqrt2020.zip`, whose only member is `AusApparalSales4thQrt2020.csv`.
+- **In Simplilearn Practice Labs:** place `AAL_Sales_Analysis.ipynb` alongside `AusApparalSales4thQrt2020.csv` in JupyterLab's file browser. Open the notebook and run the cells in order.
+- **In a local copy of this project:** place the supplied ZIP in `data/`, open `notebooks/AAL_Sales_Analysis.ipynb` in JupyterLab, and run its cells.
 
-These **original binary/source files are not yet committed** to this GitHub folder. The course files were supplied in the ChatGPT conversation, and the notebook requires you to put the ZIP or CSV in `aal-sales-analysis/data/` when running locally. Do not commit altered source data as if it were raw.
+The original input files (the course problem statement DOCX and CSV ZIP) were supplied in the conversation; they are **not currently committed** to this GitHub repository.
 
-## First notebook: running locally
+## Data quality notes
 
-1. Place the original ZIP (or extracted CSV) in `data/`.
-2. Open `notebooks/01_data_inspection.ipynb` in JupyterLab.
-3. Install `pandas`, `matplotlib` and `seaborn` if your Python environment lacks them.
-4. Run all notebook cells, then compare the output with the [findings](01_inspection_findings.md).
+- The original data has **7,560 rows** and no null cell values or duplicate business keys.
+- There are **no records for 31 October or 31 December 2020**. Possible holiday closure/altered trading is an **unverified hypothesis**, not a confirmed explanation; reporting gaps are also possible.
+- The original `Sales` values are always `Unit × 2,500`. Both normalized columns are therefore identical within floating-point precision.
+- The source does **not** specify sales currency, and ACT does not appear in its state/territory records.
 
-## Planned course deliverables
-
-1. **Wrangling:** report missing values, explain treatment decisions, and use normalization.
-2. **Analysis:** descriptive statistics, GroupBy, weekly/monthly/quarterly aggregation.
-3. **Visualizations:** state × group, group × state, time of day; daily/weekly/monthly/quarterly charts.
-4. **JupyterLab report:** findings, methods, limitations and actionable recommendations.
-
-**Methodology cautions:** two entire dates are missing from Q4, source currency is unspecified, the source does not include ACT, and every row has `Sales = Unit × 2,500`. See the findings file for details.
+Additional inspection findings are in **[01_inspection_findings.md](01_inspection_findings.md)**. We will complete Sections 2–4 in order, with brief explanations accompanying each code cell.
