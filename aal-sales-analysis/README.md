@@ -2,24 +2,35 @@
 
 Course-end project for **Applied Data Science with Python**.
 
-## Objective
+## Purpose
 
-Analyze AAL's Australian clothing sales for Q4 2020. Compare revenue across states and demographic groups, identify high- and low-performing markets, and recommend targeted sales programs.
+Analyse AAL's Australian clothing sales for Q4 2020, comparing states/territories, customer groups, and sales times. Support evidence-based recommendations for AAL's sales and marketing team.
 
-## Project tasks
+## Current work
 
-1. **Data wrangling:** validate entries and missing values (`isna()` / `notna()`), document cleaning choices, and apply normalization.
-2. **Data analysis:** calculate descriptive statistics for units and sales; compare states and groups; generate weekly, monthly, and quarterly summaries.
-3. **Data visualization:** build clear charts covering state, group, and time-of-day patterns, with daily, weekly, monthly, and quarterly views.
-4. **Reporting:** present analysis, plots, findings, limitations, and actionable recommendations in a JupyterLab notebook.
+- [01 · Data inspection notebook](notebooks/01_data_inspection.ipynb): raw file loading, null checks, type validation, duplicate checks, calendar completeness, sales/units relationship, Pandas GroupBy, and the first Seaborn chart.
+- [Initial inspection findings](01_inspection_findings.md): verified figures and methodological cautions.
+
+**Status:** Data inspection complete. Further statistical analysis and dashboard development remain to be done.
 
 ## Source materials
 
-- `sales_analysis_problem_statement.docx` (course brief, provided in the conversation)
-- `AusApparalSales4thQrt2020.csv` (contained in the provided ZIP archive)
+The course provides two source files: `1739523775_sales_analysis_problem_statement.docx` and `1739523823_ausapparalsales4thqrt2020.zip`, whose only member is `AusApparalSales4thQrt2020.csv`.
 
-The source materials are **not committed to this folder yet**. This README establishes the project workspace without claiming analysis has started.
+These **original binary/source files are not yet committed** to this GitHub folder. The course files were supplied in the ChatGPT conversation, and the notebook requires you to put the ZIP or CSV in `aal-sales-analysis/data/` when running locally. Do not commit altered source data as if it were raw.
 
-## Status
+## First notebook: running locally
 
-Project initialized. Data review and implementation to follow.
+1. Place the original ZIP (or extracted CSV) in `data/`.
+2. Open `notebooks/01_data_inspection.ipynb` in JupyterLab.
+3. Install `pandas`, `matplotlib` and `seaborn` if your Python environment lacks them.
+4. Run all notebook cells, then compare the output with the [findings](01_inspection_findings.md).
+
+## Planned course deliverables
+
+1. **Wrangling:** report missing values, explain treatment decisions, and use normalization.
+2. **Analysis:** descriptive statistics, GroupBy, weekly/monthly/quarterly aggregation.
+3. **Visualizations:** state × group, group × state, time of day; daily/weekly/monthly/quarterly charts.
+4. **JupyterLab report:** findings, methods, limitations and actionable recommendations.
+
+**Methodology cautions:** two entire dates are missing from Q4, source currency is unspecified, the source does not include ACT, and every row has `Sales = Unit × 2,500`. See the findings file for details.
