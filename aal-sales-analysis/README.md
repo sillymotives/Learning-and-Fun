@@ -40,3 +40,7 @@ The GitHub notebook intentionally has **cleared execution outputs** to keep sour
 ## Review status
 
 All four sections are complete and locally tested. The notebook was executed against the original input ZIP: **92 cells; 37 code cells; 11 rendered chart figures; zero execution errors**. A separate five-test report-validation suite passed. Changes remain in **[draft PR #1](https://github.com/sillymotives/Learning-and-Fun/pull/1)** until approved for merge.
+
+## State-by-state daypart extension
+
+[Detailed state × demographic × daypart analysis](04_state_group_daypart_findings.md) investigates all 84 combinations and identifies the Queensland Men evening shortfall, Victoria Seniors' absolute difference and state-specific counterexamples. A user-reviewed, fully executed Jupyter notebook with the two associated heatmaps is available in the conversation's downloadable analysis package. The existing final course notebook on this branch has not been replaced with an older revision.
