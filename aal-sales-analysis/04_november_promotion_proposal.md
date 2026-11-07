@@ -1,6 +1,6 @@
 # Section 4 candidate recommendation: a measured November sales promotion
 
-**Status:** Agreed proposal for the final report, *not* evidence of proven campaign effectiveness and not yet a completed Section 4.
+**Status:** Included in the completed Section 4 report as a proposed pilot. This is not evidence of a campaign that has already been implemented or proven effective.
 
 ## Observation from the supplied Q4 2020 dataset
 
@@ -41,4 +41,4 @@ These choices are **hypotheses for experiments**, not evidence that Women in WA 
 
 **Not observable in the dataset:** individual customer spending, basket size, unit price changes, margin, promotional attribution, stock availability, store count, campaign expense, footfall or year-on-year November seasonality.
 
-This recommendation will become the lead candidate in Section 4's final marketing recommendations, subject to transparent limitations and a report-level synthesis.
+This proposed pilot is incorporated into the completed [JupyterLab report](notebooks/AAL_Sales_Analysis.ipynb), with the broader findings and limitations in [04_final_executive_summary.md](04_final_executive_summary.md).
