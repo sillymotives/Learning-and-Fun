@@ -50,3 +50,9 @@ Changes to Sections 1 and 2 are staged in draft PR #1, not merged into main.
 ## Current status
 
 **Section 3 is complete.** The Jupyter notebook includes a labelled four-panel dashboard and the required daily, weekly, monthly, and quarterly charts, with missing-date warnings. Section 4 (final report) remains to be completed.
+
+## Section 4 recommendation candidate
+
+The first agreed recommendation is a **controlled November promotion pilot**, potentially around Black Friday, with profitability, store-level controls and possible December sales displacement evaluated before rollout. This is a hypothesis to test, not an established cause of November's lower recorded revenue.
+
+See **[November promotion pilot recommendation](04_november_promotion_proposal.md)** for evidence, design, metrics and limitations. Section 4's final report remains **unfinished**.
