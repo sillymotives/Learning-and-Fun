@@ -6,7 +6,7 @@ The main Jupyter notebook follows the assignment rubric in order.
 | Section | Status |
 | --- | --- |
 | 1. Data Wrangling | Complete: validation, missing-day decision, Min-Max normalization, GroupBy |
-| 2. Data Analysis | Complete: descriptive statistics, group/state rankings, weekly/monthly/quarterly reports |
+| 2. Data Analysis | Complete: descriptive statistics, state/group comparisons, regional demographic breakdown, weekly/monthly/quarterly reports, high/low sales-volume periods |
 | 3. Data Visualization | Not started |
 | 4. Report Generation | Not started |
 
@@ -15,6 +15,8 @@ The main Jupyter notebook follows the assignment rubric in order.
 - `notebooks/AAL_Sales_Analysis.ipynb` - main notebook for Sections 1 and 2.
 - `notebooks/01_data_inspection.ipynb` - earlier exploratory work; kept unchanged.
 - `01_inspection_findings.md` - source checks and caveats.
+- `02_regional_demographic_findings.md` - demographic patterns in the lower-selling areas and decision cautions.
+- `02_spending_intensity_findings.md` - sales-volume comparisons, not customer-level spend.
 - `data/1739523823_ausapparalsales4thqrt2020.zip` - untouched original CSV archive.
 - `sales_analysis_problem_statement.docx` - untouched course instructions.
 
@@ -34,10 +36,12 @@ Install Pandas and JupyterLab if your environment does not include them.
 - Source `Sales` currency is unspecified; do not assume AUD.
 - Every row follows `Sales = Unit x 2500`. Normalized Units/Sales therefore match.
 - The data includes seven geographic categories but no ACT, store counts or marketing spend.
+- Every group supplies about one-quarter of its state sales; no segment can be responsibly dropped based solely on revenue.
+- We do not have customer identifiers, receipts or transaction counts, so recorded-period volume is not average customer spend.
 - Weekly reports use Monday-Sunday calendar weeks; first/last weeks cover partial Q4 periods.
 
 ## GitHub
 
-https://github.com/sillymotives/Learning-and-Fun/tree/main/aal-sales-analysis
+https://github.com/sillymotives/Learning-and-Fun/pull/1
 
 Changes to Sections 1 and 2 are staged in draft PR #1, not merged into main.
