@@ -44,6 +44,8 @@
 
 This first audit identified no empty cells, parsing failures, duplicate business keys or negative sales. It did identify two *absent whole days*, which cannot be repaired responsibly without more information. The raw categorical fields require whitespace trimming.
 
+**Possible holiday-trading explanation (hypothesis, not a finding):** 31 October 2020 is Halloween and 31 December 2020 is New Year's Eve. AAL might have altered trading or closed locations on those dates, but the records alone cannot establish this. A reporting or extraction omission is another plausible explanation. In particular, Halloween is not generally a retail closure day in Australia. Check the business's opening calendar or source-data collection process before treating either date as a confirmed closure. Do not impute missing sales based on this unverified hypothesis.
+
 Every recorded combination of the 90 observed days, seven geographic categories, four groups and three day periods is present: `90 × 7 × 4 × 3 = 7,560`.
 
 State differences in sales alone do **not** prove relative store-level productivity or untapped market potential. The source provides no location count, marketing-spend, price variability, store footfall, or geographic population data. The Australian Capital Territory is not represented, and the source does not specify currency.
