@@ -7,16 +7,18 @@ The main Jupyter notebook follows the assignment rubric in order.
 | --- | --- |
 | 1. Data Wrangling | Complete: validation, missing-day decision, Min-Max normalization, GroupBy |
 | 2. Data Analysis | Complete: descriptive statistics, state/group comparisons, regional demographic breakdown, weekly/monthly/quarterly reports, high/low sales-volume periods |
-| 3. Data Visualization | Not started |
+| 3. Data Visualization | Complete: state/group/daypart plots, daily/weekly/monthly/quarterly charts, box plot, histogram, dashboard |
 | 4. Report Generation | Not started |
 
 ## Start here
 
-- `notebooks/AAL_Sales_Analysis.ipynb` - main notebook for Sections 1 and 2.
+- `notebooks/AAL_Sales_Analysis.ipynb` - main rubric-ordered notebook for Sections 1–3.
 - `notebooks/01_data_inspection.ipynb` - earlier exploratory work; kept unchanged.
 - `01_inspection_findings.md` - source checks and caveats.
 - `02_regional_demographic_findings.md` - demographic patterns in the lower-selling areas and decision cautions.
 - `02_spending_intensity_findings.md` - sales-volume comparisons, not customer-level spend.
+- `03_visualization_findings.md` - Section 3 chart inventory, takeaways and caveats.
+- `AAL_Section_3_Dashboard.png` - optional dashboard preview in the downloadable project package.
 - `data/1739523823_ausapparalsales4thqrt2020.zip` - untouched original CSV archive.
 - `sales_analysis_problem_statement.docx` - untouched course instructions.
 
@@ -45,3 +47,6 @@ Install Pandas and JupyterLab if your environment does not include them.
 https://github.com/sillymotives/Learning-and-Fun/pull/1
 
 Changes to Sections 1 and 2 are staged in draft PR #1, not merged into main.
+## Current status
+
+**Section 3 is complete.** The Jupyter notebook includes a labelled four-panel dashboard and the required daily, weekly, monthly, and quarterly charts, with missing-date warnings. Section 4 (final report) remains to be completed.
